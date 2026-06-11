@@ -2,13 +2,11 @@ import { Component, inject, signal, computed, effect, OnInit, OnDestroy } from '
 import { Apollo } from 'apollo-angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CurrencyBobPipe } from '../../shared/pipes/currency-bob.pipe';
 import { AuthService } from '../../core/auth/auth.service';
 import { AsientoSeatMap } from '../../shared/components/seat-map/seat-map.component';
-import { environment } from '../../../environments/environment';
 import { debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import {
@@ -34,7 +32,6 @@ interface ClienteEncontrado { id: string; ci: string; nombre: string; telefono?:
 })
 export class VentasComponent implements OnInit, OnDestroy {
   private apollo = inject(Apollo);
-  private http = inject(HttpClient);
   private auth = inject(AuthService);
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
@@ -304,29 +301,12 @@ export class VentasComponent implements OnInit, OnDestroy {
   }
 
   descargarPDF(): void {
-    const url = this.boletoEmitido()?.pdfUrl
-      || `${environment.apiUrl}/boletos/${this.boletoEmitido()?.id}/pdf`;
-    this.descargarUrl(url, `boleto-${this.boletoEmitido()?.id || 'descarga'}.pdf`);
+    const url = this.boletoEmitido()?.pdfUrl;
+    if (url) window.open(url, '_blank');
   }
 
   descargarFactura(): void {
     const url = this.boletoEmitido()?.factura?.pdfUrl;
-    if (url) this.descargarUrl(url, `factura-${this.boletoEmitido()?.id || 'descarga'}.pdf`);
-  }
-
-  private descargarUrl(url: string, filename: string): void {
-    const token = this.auth.getToken();
-    const headers = new HttpHeaders().set('Authorization', 'Bearer ' + (token || ''));
-    this.http.get(url, { headers, responseType: 'blob' }).subscribe({
-      next: (blob) => {
-        const blobUrl = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = filename;
-        a.click();
-        window.URL.revokeObjectURL(blobUrl);
-      },
-      error: () => this.snackBar.open('Error al descargar', 'Cerrar', { duration: 3000 }),
-    });
+    if (url) window.open(url, '_blank');
   }
 }
