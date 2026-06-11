@@ -4,7 +4,7 @@
 @use 'variables';
 @use 'theme';
 @use 'dark-theme';
-@import url('../../node_modules/leaflet/dist/leaflet.css');
+@import 'leaflet/dist/leaflet.css';
 
 html {
   @include mat.all-component-themes(theme.$bustrack-light-theme);

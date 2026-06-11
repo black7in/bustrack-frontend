@@ -65,7 +65,7 @@ export class MonitorComponent implements OnInit, OnDestroy, AfterViewInit {
       this.markers.push(m);
       bounds.push(L.latLng(pos));
     }
-    if (bounds.length > 0) this.map.fitBounds(bounds, { padding: [40, 40] });
+    if (bounds.length > 0) this.map.fitBounds(L.latLngBounds(bounds).pad(0.1));
   }
 
   getVelocidad(v: ViajeActivo): string { return v.ultimaPosicion?.velocidadKmh ? v.ultimaPosicion.velocidadKmh + ' km/h' : '---'; }
