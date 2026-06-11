@@ -179,7 +179,7 @@ export class DashboardComponent implements OnInit {
 
   private loadPrediccion(): void {
     const ruta = this.viajes()[0];
-    if (!ruta) return;
+    if (!ruta || !this.auth.getToken()) return;
     this.http.get<any>(`${environment.iaApiUrl}/prediccion/demanda`, {
       headers: this.headers(),
       params: { rutaId: ruta.horario.ruta.origen.nombre + '-' + ruta.horario.ruta.destino.nombre, fecha: this.fechaInicio() },
@@ -187,6 +187,7 @@ export class DashboardComponent implements OnInit {
   }
 
   private loadSegmentacion(): void {
+    if (!this.auth.getToken()) return;
     this.http.get<any>(`${environment.iaApiUrl}/segmentacion/clientes`, { headers: this.headers() }).subscribe({ next: (r) => this.segmentacion.set(r) });
   }
 
