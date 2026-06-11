@@ -90,6 +90,7 @@ export class ClientesComponent {
     this.boletos.set([]);
     this.clienteSegmento.set(null);
   }
+}
 
   cerrarDetalle(): void {
     this.clienteSeleccionado.set(null);
