@@ -120,19 +120,19 @@
 
     @if (prediccion()) {
       <div class="pred-grid">
-        <div class="pred-stat"><span class="ps-label">Ocupacion predicha</span><span class="ps-value mono">{{ (prediccion().ocupacionPredicha * 100).toFixed(0) }}%</span></div>
-        <div class="pred-stat"><span class="ps-label">Precio sugerido</span><span class="ps-value mono">Bs {{ prediccion().precioSugerido?.toFixed(0) }}</span></div>
-        <div class="pred-stat"><span class="ps-label">Ajuste</span><span class="ps-value" [style.color]="prediccion().ajustePorcentaje >= 0 ? 'var(--ok-600)' : 'var(--err-600)'">{{ prediccion().ajustePorcentaje >= 0 ? '+' : '' }}{{ prediccion().ajustePorcentaje?.toFixed(1) }}%</span></div>
-        <div class="pred-stat"><span class="ps-label">Confianza</span><span class="ps-value mono">{{ (prediccion().confianza * 100).toFixed(0) }}%</span></div>
+        <div class="pred-stat"><span class="ps-label">Ocupacion predicha</span><span class="ps-value mono">{{ ((prediccion().ocupacion_predicha || prediccion().ocupacionPredicha) * 100).toFixed(0) }}%</span></div>
+        <div class="pred-stat"><span class="ps-label">Precio sugerido</span><span class="ps-value mono">Bs {{ (prediccion().precio_sugerido || prediccion().precioSugerido)?.toFixed(0) }}</span></div>
+        <div class="pred-stat"><span class="ps-label">Ajuste</span><span class="ps-value" [style.color]="(prediccion().ajuste_porcentaje || prediccion().ajustePorcentaje) >= 0 ? 'var(--ok-600)' : 'var(--err-600)'">{{ (prediccion().ajuste_porcentaje || prediccion().ajustePorcentaje) >= 0 ? '+' : '' }}{{ (prediccion().ajuste_porcentaje || prediccion().ajustePorcentaje)?.toFixed(1) }}%</span></div>
+        <div class="pred-stat"><span class="ps-label">Confianza</span><span class="ps-value mono">{{ ((prediccion().confianza) * 100).toFixed(0) }}%</span></div>
       </div>
       @if (prediccion().factores) {
         <div class="pred-factores">
           <span class="ps-label">Factores:</span>
-          <span class="chip">{{ prediccion().factores.diaSemana }}</span>
-          @if (prediccion().factores.esFeriado) { <span class="chip">Feriado</span> }
+          <span class="chip">{{ prediccion().factores.dia_semana || prediccion().factores.diaSemana }}</span>
+          @if (prediccion().factores.es_feriado || prediccion().factores.esFeriado) { <span class="chip">Feriado</span> }
           <span class="chip">{{ prediccion().factores.temporada }}</span>
-          <span class="chip">Historico: {{ (prediccion().factores.historicoPromedio * 100).toFixed(0) }}%</span>
-          @if (prediccion().desdeCache) { <span class="chip cache">Cache</span> }
+          <span class="chip">Historico: {{ ((prediccion().factores.historico_promedio || prediccion().factores.historicoPromedio) * 100).toFixed(0) }}%</span>
+          @if (prediccion().desde_cache || prediccion().desdeCache) { <span class="chip cache">Cache</span> }
         </div>
       }
     }
