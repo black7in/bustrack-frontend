@@ -82,6 +82,10 @@ export const VENDER_BOLETO = gql`
       cliente { nombre ci }
       asiento { numeroAsiento }
       pdfUrl
+      factura {
+        numeroFactura
+        pdfUrl
+      }
     }
   }
 `;

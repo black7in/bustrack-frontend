@@ -304,7 +304,17 @@ export class VentasComponent implements OnInit, OnDestroy {
   }
 
   descargarPDF(): void {
-    const url = this.boletoEmitido()?.pdfUrl || environment.apiUrl + '/boletos/' + (this.boletoEmitido()?.id || '') + '/pdf';
+    const url = this.boletoEmitido()?.pdfUrl
+      || `${environment.apiUrl}/boletos/${this.boletoEmitido()?.id}/pdf`;
+    this.descargarUrl(url, `boleto-${this.boletoEmitido()?.id || 'descarga'}.pdf`);
+  }
+
+  descargarFactura(): void {
+    const url = this.boletoEmitido()?.factura?.pdfUrl;
+    if (url) this.descargarUrl(url, `factura-${this.boletoEmitido()?.id || 'descarga'}.pdf`);
+  }
+
+  private descargarUrl(url: string, filename: string): void {
     const token = this.auth.getToken();
     const headers = new HttpHeaders().set('Authorization', 'Bearer ' + (token || ''));
     this.http.get(url, { headers, responseType: 'blob' }).subscribe({
@@ -312,11 +322,11 @@ export class VentasComponent implements OnInit, OnDestroy {
         const blobUrl = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = blobUrl;
-        a.download = 'boleto-' + (this.boletoEmitido()?.id || 'descarga') + '.pdf';
+        a.download = filename;
         a.click();
         window.URL.revokeObjectURL(blobUrl);
       },
-      error: () => this.snackBar.open('Error al descargar PDF', 'Cerrar', { duration: 3000 }),
+      error: () => this.snackBar.open('Error al descargar', 'Cerrar', { duration: 3000 }),
     });
   }
 }

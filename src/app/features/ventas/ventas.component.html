@@ -28,6 +28,11 @@
           <button class="btn btn-primary btn-sm" (click)="descargarPDF()">
             <mat-icon>picture_as_pdf</mat-icon> Descargar Boleto
           </button>
+          @if (boletoEmitido()?.factura?.pdfUrl) {
+            <button class="btn btn-outline btn-sm" (click)="descargarFactura()">
+              <mat-icon>receipt_long</mat-icon> Descargar Factura
+            </button>
+          }
           <button class="btn btn-accent btn-sm" (click)="nuevoBoleto()">
             <mat-icon>add</mat-icon> Nueva venta
           </button>
