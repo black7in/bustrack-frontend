@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../core/auth/auth.service';
@@ -14,7 +14,25 @@ import { Subject } from 'rxjs';
 import { CLIENTES, BOLETOS_POR_CLIENTE } from '../../graphql/clientes.graphql';
 
 interface ClienteItem { id: string; ci: string; nombre: string; telefono?: string; email?: string }
-interface BoletoItem { id: string; fechaVenta: string; precioPagado: number; estado: string; asiento: { numeroAsiento: string }; viaje: { id: string; fecha: string; horario: { horaSalida: string; ruta: { origen: { nombre: string }; destino: { nombre: string } } } } }
+
+interface BoletoItem {
+  id: string;
+  fechaVenta: string;
+  precioPagado: number;
+  estado: string;
+  asiento: { numeroAsiento: string };
+  viaje: {
+    id: string;
+    fecha: string;
+    horario: {
+      horaSalida: string;
+      ruta: {
+        origen: { nombre: string };
+        destino: { nombre: string };
+      };
+    };
+  };
+}
 
 @Component({
   selector: 'app-clientes',
@@ -74,7 +92,9 @@ export class ClientesComponent {
       variables: { clienteId: cliente.id },
       fetchPolicy: 'network-only',
     }).subscribe({
-      next: (r) => { if (r.data?.boletos) this.boletos.set(r.data.boletos); },
+      next: (r) => {
+        if (r.data?.boletos?.items) this.boletos.set(r.data.boletos.items);
+      },
       error: (err) => this.snackBar.open(err.message || 'Error al cargar boletos', 'Cerrar', { duration: 3000 }),
     });
     const token = this.auth.getToken();
@@ -89,11 +109,5 @@ export class ClientesComponent {
     this.clienteSeleccionado.set(null);
     this.boletos.set([]);
     this.clienteSegmento.set(null);
-  }
-}
-
-  cerrarDetalle(): void {
-    this.clienteSeleccionado.set(null);
-    this.boletos.set([]);
   }
 }
