@@ -73,6 +73,24 @@ export const CREAR_CLIENTE = gql`
   }
 `;
 
+export const BOLETO_POR_ID = gql`
+  query BoletoPorId($id: ID!) {
+    boleto(id: $id) {
+      id
+      estado
+      precioPagado
+      cliente { nombre ci }
+      asiento { numeroAsiento }
+      pdfUrl
+      factura {
+        numeroFactura
+        pdfUrl
+        blockchainTxHash
+      }
+    }
+  }
+`;
+
 export const VENDER_BOLETO = gql`
   mutation VenderBoleto($input: VenderBoletoInput!) {
     venderBoleto(input: $input) {
@@ -85,6 +103,7 @@ export const VENDER_BOLETO = gql`
       factura {
         numeroFactura
         pdfUrl
+        blockchainTxHash
       }
     }
   }
