@@ -241,7 +241,7 @@ export class ReportesComponent {
 
   private buildOcupacionChart(): void {
     const data = this.ocupacionData();
-    const fechas = data.map((d: any) => new Date(parseInt(d.fecha)).toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit' }));
+    const fechas = data.map((d: any) => new Date(d.fecha).toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit' }));
     const pcts = data.map((d: any) => d.porcentaje);
     this.ocupacionChartOptions.set({
       ...this.ocupacionChartOptions(),
@@ -259,11 +259,11 @@ export class ReportesComponent {
     const dataActual: number[] = new Array(31).fill(0);
     const dataAnterior: number[] = new Array(31).fill(0);
     for (const item of actual) {
-      const d = new Date(parseInt(item.fecha)).getDate();
+      const d = new Date(item.fecha).getDate();
       if (d >= 1 && d <= 31) dataActual[d - 1] = item.totalIngresos;
     }
     for (const item of anterior) {
-      const d = new Date(parseInt(item.fecha)).getDate();
+      const d = new Date(item.fecha).getDate();
       if (d >= 1 && d <= 31) dataAnterior[d - 1] = item.totalIngresos;
     }
     this.comparativoOptions.set({
