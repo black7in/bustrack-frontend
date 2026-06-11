@@ -9,6 +9,7 @@ import { RouterLink } from '@angular/router';
 import { StatCardComponent } from '../../shared/components/stat-card/stat-card.component';
 import { StatusBadgeComponent, BadgeVariant } from '../../shared/components/status-badge/status-badge.component';
 import { CurrencyBobPipe } from '../../shared/pipes/currency-bob.pipe';
+import { ChartDirective } from '../../shared/components/chart/chart.directive';
 import { AuthService } from '../../core/auth/auth.service';
 import { environment } from '../../../environments/environment';
 import { RESUMEN_VENTAS, VIAJES_DEL_DIA } from '../../graphql/dashboard.graphql';
@@ -40,7 +41,7 @@ const ESTADO_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
   imports: [
     CommonModule, DatePipe, RouterLink,
     MatIconModule, MatButtonModule, MatMenuModule,
-    StatCardComponent, StatusBadgeComponent, CurrencyBobPipe,
+    StatCardComponent, StatusBadgeComponent, CurrencyBobPipe, ChartDirective,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
@@ -56,6 +57,21 @@ export class DashboardComponent implements OnInit {
 
   readonly prediccion = signal<any>(null);
   readonly segmentacion = signal<any>(null);
+
+  readonly segmentacionChart = computed(() => {
+    const s = this.segmentacion();
+    if (!s?.segmentos?.length) return {};
+    return {
+      tooltip: { trigger: 'item' as const, formatter: '{b}: {c} clientes ({d}%)' },
+      legend: { bottom: 0, textStyle: { color: 'var(--color-text-secondary)', fontSize: 11 } },
+      series: [{
+        type: 'pie', radius: ['45%', '75%'], center: ['50%', '45%'],
+        itemStyle: { borderRadius: 6, borderColor: 'var(--color-surface)', borderWidth: 3 },
+        label: { show: false },
+        data: s.segmentos.map((seg: any) => ({ name: seg.nombre, value: seg.totalClientes })),
+      }],
+    };
+  });
 
   readonly periodo = signal<Periodo>('hoy');
   readonly customStart = signal<string | null>(null);

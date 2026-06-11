@@ -1,10 +1,10 @@
 import { Directive, ElementRef, input, effect, OnDestroy, Injector, runInInjectionContext, EmbeddedViewRef } from '@angular/core';
 import * as echarts from 'echarts/core';
-import { BarChart, LineChart, HeatmapChart } from 'echarts/charts';
+import { BarChart, LineChart, HeatmapChart, PieChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent, LegendComponent, VisualMapComponent, MarkLineComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 
-echarts.use([BarChart, LineChart, HeatmapChart, GridComponent, TooltipComponent, LegendComponent, VisualMapComponent, MarkLineComponent, CanvasRenderer]);
+echarts.use([BarChart, LineChart, HeatmapChart, PieChart, GridComponent, TooltipComponent, LegendComponent, VisualMapComponent, MarkLineComponent, CanvasRenderer]);
 
 @Directive({
   selector: '[appChart]',

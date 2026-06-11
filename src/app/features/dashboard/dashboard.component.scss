@@ -77,25 +77,24 @@
   gap: 16px;
 }
 
-.ai-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.seg-full { padding: 22px; }
+.seg-title { margin: 0 0 4px; font-size: 18px; font-weight: 700; color: var(--ink-900); }
+.seg-layout { display: flex; gap: 24px; align-items: center; margin-top: 14px; }
+.seg-cards { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.seg-stat { padding: 12px; background: var(--ink-050); border-radius: var(--r-md); }
+.ss-name { font-size: 13px; font-weight: 600; color: var(--ink-800); display: block; }
+.ss-pct { font-size: 22px; font-weight: 800; color: var(--brand-700); }
+.ss-count { font-size: 12px; color: var(--color-text-secondary); display: block; }
+.ss-gasto { font-size: 12px; color: var(--ok-600); font-weight: 600; }
 
-.pred-card { padding: 20px; }
+.pred-full { padding: 22px; }
 .pred-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-.pred-header h3 { margin: 0; font-size: 15px; font-weight: 700; color: var(--ink-900); }
+.pred-header h3 { margin: 0; font-size: 18px; font-weight: 700; color: var(--ink-900); }
 .pred-icon { color: var(--accent-600); font-size: 24px; width: 24px; height: 24px; }
-.pred-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.pred-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .pred-stat { display: flex; flex-direction: column; gap: 4px; }
 .ps-label { font-size: 11px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: .04em; }
-.ps-value { font-size: 18px; font-weight: 800; color: var(--ink-900); }
-
-.seg-card { padding: 20px; }
-.seg-card h3 { margin: 0 0 4px; font-size: 15px; font-weight: 700; color: var(--ink-900); }
-.seg-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
-.seg-bar { height: 8px; background: var(--ink-100); border-radius: 4px; overflow: hidden; margin-bottom: 4px; }
-.seg-fill { height: 100%; border-radius: 4px; }
-.seg-info { display: flex; justify-content: space-between; font-size: 12.5px; }
-.seg-name { font-weight: 600; color: var(--ink-700); }
-.seg-pct { font-size: 12px; }
+.ps-value { font-size: 20px; font-weight: 800; color: var(--ink-900); }
 
 .dashboard-grid {
   display: grid;

@@ -64,57 +64,46 @@
     />
   </div>
 
-  <!-- Prediccion y Segmentacion -->
-  <div class="ai-row">
-    @if (prediccion()) {
-      <div class="card pred-card">
-        <div class="pred-header">
-          <mat-icon class="pred-icon">psychology</mat-icon>
-          <div>
-            <h3>Prediccion de demanda</h3>
-            <p class="muted">{{ prediccion().rutaId }} · {{ prediccion().fecha | date:'d/M' }}</p>
-          </div>
-        </div>
-        <div class="pred-grid">
-          <div class="pred-stat">
-            <span class="ps-label">Ocupacion predicha</span>
-            <span class="ps-value mono">{{ (prediccion().ocupacionPredicha * 100).toFixed(0) }}%</span>
-          </div>
-          <div class="pred-stat">
-            <span class="ps-label">Precio sugerido</span>
-            <span class="ps-value mono">Bs {{ prediccion().precioSugerido?.toFixed(0) }}</span>
-          </div>
-          <div class="pred-stat">
-            <span class="ps-label">Ajuste</span>
-            <span class="ps-value" [style.color]="prediccion().ajustePorcentaje >= 0 ? 'var(--ok-600)' : 'var(--err-600)'">{{ prediccion().ajustePorcentaje >= 0 ? '+' : '' }}{{ prediccion().ajustePorcentaje?.toFixed(1) }}%</span>
-          </div>
-          <div class="pred-stat">
-            <span class="ps-label">Confianza</span>
-            <span class="ps-value mono">{{ (prediccion().confianza * 100).toFixed(0) }}%</span>
-          </div>
-        </div>
-      </div>
-    }
-
-    @if (segmentacion()) {
-      <div class="card seg-card">
-        <h3>Segmentacion de clientes</h3>
-        <p class="muted">{{ segmentacion().totalClientes }} clientes · {{ segmentacion().segmentos?.length || 0 }} segmentos</p>
-        <div class="seg-list">
+  <!-- Segmentacion -->
+  @if (segmentacion()) {
+    <div class="card seg-full">
+      <h3 class="seg-title">Segmentacion de clientes</h3>
+      <p class="muted">{{ segmentacion().totalClientes }} clientes · {{ segmentacion().modeloVersion }}</p>
+      <div class="seg-layout">
+        <div [appChart]="segmentacionChart()" style="height:260px;flex:1"></div>
+        <div class="seg-cards">
           @for (s of segmentacion().segmentos; track s.id) {
-            <div class="seg-item">
-              <div class="seg-bar">
-                <div class="seg-fill" [style.width.%]="s.porcentaje" [style.background]="'var(--brand-600)'"></div>
-              </div>
-              <div class="seg-info">
-                <span class="seg-name">{{ s.nombre }}</span>
-                <span class="seg-pct mono">{{ s.totalClientes }} ({{ s.porcentaje }}%)</span>
-              </div>
+            <div class="seg-stat">
+              <span class="ss-name">{{ s.nombre }}</span>
+              <span class="ss-pct mono">{{ s.porcentaje }}%</span>
+              <span class="ss-count">{{ s.totalClientes }} clientes</span>
+              @if (s.caracteristicas?.gastoPromedio) {
+                <span class="ss-gasto">Bs {{ s.caracteristicas.gastoPromedio?.toFixed(0) }} prom.</span>
+              }
             </div>
           }
         </div>
       </div>
-    }
-  </div>
+    </div>
+  }
+
+  <!-- Prediccion -->
+  @if (prediccion()) {
+    <div class="card pred-full">
+      <div class="pred-header">
+        <mat-icon class="pred-icon">psychology</mat-icon>
+        <div>
+          <h3>Prediccion de demanda</h3>
+          <p class="muted">{{ prediccion().rutaId }} · {{ prediccion().fecha | date:'d/M' }}</p>
+        </div>
+      </div>
+      <div class="pred-grid">
+        <div class="pred-stat"><span class="ps-label">Ocupacion predicha</span><span class="ps-value mono">{{ (prediccion().ocupacionPredicha * 100).toFixed(0) }}%</span></div>
+        <div class="pred-stat"><span class="ps-label">Precio sugerido</span><span class="ps-value mono">Bs {{ prediccion().precioSugerido?.toFixed(0) }}</span></div>
+        <div class="pred-stat"><span class="ps-label">Ajuste</span><span class="ps-value" [style.color]="prediccion().ajustePorcentaje >= 0 ? 'var(--ok-600)' : 'var(--err-600)'">{{ prediccion().ajustePorcentaje >= 0 ? '+' : '' }}{{ prediccion().ajustePorcentaje?.toFixed(1) }}%</span></div>
+        <div class="pred-stat"><span class="ps-label">Confianza</span><span class="ps-value mono">{{ (prediccion().confianza * 100).toFixed(0) }}%</span></div>
+      </div>
+    </div>
+  }
 
 </div>
