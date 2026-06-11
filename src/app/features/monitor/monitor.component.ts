@@ -8,7 +8,8 @@ import { AuthService } from '../../core/auth/auth.service';
 import { environment } from '../../../environments/environment';
 import * as L from 'leaflet';
 
-interface ViajeActivo { viajeId: string; ruta: string; horaSalida: string; busPlaca: string; choferNombre: string; ultimaPosicion: { lat: number; lng: number; velocidadKmh: number; timestamp: string }; abordados: number; vendidos: number }
+interface UltimaPosicion { lat: number; lng: number; velocidadKmh: number; timestamp: string }
+interface ViajeActivo { viajeId: string; ultimaPosicion: UltimaPosicion; abordados: number }
 
 @Component({
   selector: 'app-monitor',
@@ -28,10 +29,7 @@ export class MonitorComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit() { this.load(); this.interval = setInterval(() => this.load(), 30000); }
   ngOnDestroy() { clearInterval(this.interval); if (this.map) this.map.remove(); }
-
-  ngAfterViewInit() {
-    this.initMap();
-  }
+  ngAfterViewInit() { this.initMap(); }
 
   private initMap() {
     if (this.map) return;
@@ -46,7 +44,10 @@ export class MonitorComponent implements OnInit, OnDestroy, AfterViewInit {
   load(): void {
     this.loading.set(true);
     this.http.get<any>(`${environment.operacionesApiUrl}/viajes/activos`, { headers: this.headers() }).subscribe({
-      next: (r) => { this.loading.set(false); if (r?.viajes) { this.viajes.set(r.viajes); this.updateMarkers(); } },
+      next: (r) => {
+        this.loading.set(false);
+        if (r?.viajes) { this.viajes.set(r.viajes); this.updateMarkers(); }
+      },
       error: () => this.loading.set(false),
     });
   }
@@ -59,14 +60,25 @@ export class MonitorComponent implements OnInit, OnDestroy, AfterViewInit {
     for (const v of this.viajes()) {
       if (!v.ultimaPosicion?.lat) continue;
       const pos: L.LatLngTuple = [v.ultimaPosicion.lat, v.ultimaPosicion.lng];
-      const m = L.marker(pos).addTo(this.map).bindPopup(
-        `<b>${v.busPlaca}</b><br>${v.ruta}<br>${v.choferNombre}<br>${v.ultimaPosicion.velocidadKmh} km/h<br><a href="/app/monitor/${v.viajeId}">Ver detalle</a>`
-      );
+      const popup = [
+        `<b>Viaje ${v.viajeId.slice(0, 8)}...</b>`,
+        `Abordados: ${v.abordados}`,
+        `Velocidad: ${v.ultimaPosicion.velocidadKmh} km/h`,
+        `<a href="/app/monitor/${v.viajeId}">Ver detalle</a>`,
+      ].join('<br>');
+      const m = L.marker(pos).addTo(this.map!).bindPopup(popup);
       this.markers.push(m);
       bounds.push(L.latLng(pos));
     }
     if (bounds.length > 0) this.map.fitBounds(L.latLngBounds(bounds).pad(0.1));
   }
 
-  getVelocidad(v: ViajeActivo): string { return v.ultimaPosicion?.velocidadKmh ? v.ultimaPosicion.velocidadKmh + ' km/h' : '---'; }
+  getVelocidad(v: ViajeActivo): string {
+    return v.ultimaPosicion?.velocidadKmh != null ? v.ultimaPosicion.velocidadKmh + ' km/h' : '---';
+  }
+
+  formatTimestamp(ts?: string): string {
+    if (!ts) return '---';
+    return new Date(ts).toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' });
+  }
 }

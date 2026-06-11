@@ -1,6 +1,11 @@
 .page { padding: 28px; display: flex; flex-direction: column; gap: 20px; }
 .page-title { margin: 0; font-size: 20px; font-weight: 700; color: var(--ink-900); }
 .top-bar { display: flex; justify-content: space-between; align-items: center; }
+.top-bar-right { display: flex; align-items: center; gap: 12px; }
+.badge-activos { padding: 3px 10px; background: var(--ok-050); color: var(--ok-700); border-radius: 20px; font-size: 12px; font-weight: 700; }
+.coords { font-size: 12px; color: var(--ink-600); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 1s linear infinite; display: inline-block; }
 .map-container { height: 420px; border-radius: var(--r-lg); overflow: hidden; border: 1px solid var(--color-border); margin-bottom: 20px; z-index: 0; }
 .card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
 .tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }

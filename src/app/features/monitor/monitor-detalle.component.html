@@ -4,29 +4,38 @@
   @if (detalle()) {
     <div class="info-row">
       <div class="info-card">
-        <span class="il">Ultima posicion</span>
+        <span class="il">Última posición</span>
         <span class="iv mono">{{ detalle().ultimaPosicion?.lat?.toFixed(4) }}, {{ detalle().ultimaPosicion?.lng?.toFixed(4) }}</span>
       </div>
-      <div class="info-card"><span class="il">Velocidad</span><span class="iv">{{ detalle().ultimaPosicion?.velocidadKmh || '---' }} km/h</span></div>
+      <div class="info-card"><span class="il">Velocidad</span><span class="iv">{{ detalle().ultimaPosicion?.velocidadKmh ?? '---' }} km/h</span></div>
       <div class="info-card"><span class="il">Puntos GPS</span><span class="iv mono">{{ detalle().eventosGps || 0 }}</span></div>
       <div class="info-card"><span class="il">Abordajes</span><span class="iv mono">{{ detalle().abordajes || 0 }}</span></div>
-      <div class="info-card"><span class="il">Eventos conduccion</span><span class="iv mono">{{ detalle().eventosConduccion || 0 }}</span></div>
+      <div class="info-card"><span class="il">Eventos conducción</span><span class="iv mono">{{ detalle().eventosConduccion || 0 }}</span></div>
     </div>
   }
 
   <div class="tabs-bar">
     <button class="tb" [class.active]="tab() === 'gps'" (click)="setTab('gps')"><mat-icon>location_on</mat-icon> GPS</button>
     <button class="tb" [class.active]="tab() === 'abordaje'" (click)="setTab('abordaje')"><mat-icon>confirmation_number</mat-icon> Abordaje</button>
-    <button class="tb" [class.active]="tab() === 'conduccion'" (click)="setTab('conduccion')"><mat-icon>speed</mat-icon> Conduccion</button>
+    <button class="tb" [class.active]="tab() === 'conduccion'" (click)="setTab('conduccion')"><mat-icon>speed</mat-icon> Conducción</button>
   </div>
 
   @if (tab() === 'gps') {
     <div class="card gps-card">
-      @if (ruta()) {
-        <p class="muted">Ruta GPS: {{ ruta().totalPuntos }} puntos registrados</p>
-      } @else {
-        <div class="empty"><mat-icon>location_off</mat-icon><span>Sin datos GPS</span></div>
-      }
+      <div class="gps-info-bar">
+        @if (rutaGps()) {
+          <span class="muted"><mat-icon class="info-icon">route</mat-icon> {{ rutaGps().totalPuntos }} puntos registrados</span>
+        }
+        @if (posActual()) {
+          <span class="muted"><mat-icon class="info-icon">speed</mat-icon> {{ posActual().velocidadKmh }} km/h</span>
+          <span class="muted"><mat-icon class="info-icon">explore</mat-icon> Rumbo {{ posActual().rumbo ?? '—' }}°</span>
+          <span class="muted"><mat-icon class="info-icon">schedule</mat-icon> Hace {{ posActual().haceSegundos ?? '?' }} seg</span>
+        }
+        @if (!rutaGps() && !posActual()) {
+          <span class="muted">Sin datos GPS aún</span>
+        }
+      </div>
+      <div id="detalle-map" class="detalle-map"></div>
     </div>
   }
 
@@ -40,19 +49,40 @@
           <div class="ab-stat"><span class="mono">{{ resumen().porcentajeAbordaje }}%</span><span class="muted">% Abordaje</span></div>
         </div>
         @if (resumen().pasajerosAbordados?.length) {
-          <table class="tbl"><thead><tr><th>Asiento</th><th>Pasajero</th><th>Hora</th></tr></thead>
-            <tbody>@for (p of resumen().pasajerosAbordados; track p.asiento) { <tr><td class="mono">{{p.asiento}}</td><td>{{p.nombre}}</td><td>{{p.horaAbordaje}}</td></tr> }</tbody></table>
+          <table class="tbl">
+            <thead><tr><th>Asiento</th><th>Pasajero</th><th>Hora</th></tr></thead>
+            <tbody>
+              @for (p of resumen().pasajerosAbordados; track p.asiento) {
+                <tr><td class="mono">{{ p.asiento }}</td><td>{{ p.nombre }}</td><td>{{ p.horaAbordaje }}</td></tr>
+              }
+            </tbody>
+          </table>
         }
-      } @else { <div class="empty"><mat-icon>inbox</mat-icon><span>Sin datos de abordaje</span></div> }
+      } @else {
+        <div class="empty"><mat-icon>inbox</mat-icon><span>Sin datos de abordaje</span></div>
+      }
     </div>
   }
 
   @if (tab() === 'conduccion') {
     <div class="card">
       @if (conduccion().length) {
-        <table class="tbl"><thead><tr><th>Tipo</th><th>Intensidad</th><th>Velocidad</th><th>Hora</th></tr></thead>
-          <tbody>@for (e of conduccion(); track e.timestamp) { <tr><td>{{ subtipoLabel(e.subtipo) }}</td><td class="mono">{{ e.intensidadG?.toFixed(2) }}G</td><td class="mono">{{ e.velocidadKmh }} km/h</td><td>{{ e.timestamp | date:'HH:mm:ss' }}</td></tr> }</tbody></table>
-      } @else { <div class="empty"><mat-icon>check_circle</mat-icon><span>Sin eventos de conduccion</span></div> }
+        <table class="tbl">
+          <thead><tr><th>Tipo</th><th>Intensidad</th><th>Velocidad</th><th>Hora</th></tr></thead>
+          <tbody>
+            @for (e of conduccion(); track e.timestamp) {
+              <tr>
+                <td>{{ subtipoLabel(e.subtipo) }}</td>
+                <td class="mono">{{ e.intensidadG?.toFixed(2) }}G</td>
+                <td class="mono">{{ e.velocidadKmh }} km/h</td>
+                <td>{{ e.timestamp | date:'HH:mm:ss' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <div class="empty"><mat-icon>check_circle</mat-icon><span>Sin eventos de conducción registrados</span></div>
+      }
     </div>
   }
 </div>
