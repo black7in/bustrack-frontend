@@ -22,4 +22,5 @@
 .btn-ghost:hover { background: var(--ink-100); }
 .mono { font-family: var(--font-mono); }
 .muted { color: var(--color-text-secondary); }
+.pag { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 14px; border-top: 1px solid var(--color-divider); font-size: 13px; color: var(--color-text-secondary); }
 select.inp { cursor: pointer; }

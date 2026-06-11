@@ -44,7 +44,15 @@
                 @if (v.estado === 'PROGRAMADO') {
                   <button class="btn btn-ghost btn-icon" (click)="cancelar(v.id)" title="Cancelar"><mat-icon style="color:var(--err-600)">cancel</mat-icon></button>
                 }
-              </div>
+    </div>
+
+    @if (total() > pageSize) {
+      <div class="pag">
+        <button class="btn btn-ghost btn-sm" [disabled]="page() === 1" (click)="page.set(page()-1); loadViajes()"><mat-icon>chevron_left</mat-icon></button>
+        <span>Pag {{ page() }} de {{ Math.ceil(total() / pageSize) }}</span>
+        <button class="btn btn-ghost btn-sm" [disabled]="page() >= Math.ceil(total() / pageSize)" (click)="page.set(page()+1); loadViajes()"><mat-icon>chevron_right</mat-icon></button>
+      </div>
+    }
             </td>
           </tr>
         }

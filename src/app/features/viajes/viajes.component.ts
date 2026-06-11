@@ -34,6 +34,7 @@ export class ViajesComponent {
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private auth = inject(AuthService);
+  readonly Math = Math;
   readonly viajes = signal<ViajeItem[]>([]);
   readonly total = signal(0);
   readonly loading = signal(false);
@@ -41,6 +42,8 @@ export class ViajesComponent {
   readonly filterRutaId = signal('');
   readonly filterEstado = signal('');
   readonly rutas = signal<any[]>([]);
+  readonly page = signal(1);
+  readonly pageSize = 20;
   readonly showGenerarBtn = computed(() => {
     const rol = this.auth.usuario()?.rol;
     return rol === 'ADMIN' || rol === 'SUPERVISOR';
@@ -60,7 +63,7 @@ export class ViajesComponent {
 
   loadViajes(): void {
     this.loading.set(true);
-    const vars: any = { page: 1, limit: 20 };
+    const vars: any = { page: this.page(), limit: this.pageSize };
     if (this.filterFecha()) vars.fecha = this.filterFecha();
     if (this.filterRutaId()) vars.rutaId = this.filterRutaId();
     if (this.filterEstado()) vars.estado = this.filterEstado();
