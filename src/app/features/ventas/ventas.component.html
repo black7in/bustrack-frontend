@@ -25,15 +25,15 @@
         </div>
 
         <div class="success-actions">
-          <button class="btn btn-primary btn-sm" (click)="descargarPDF()">
+          <button class="btn btn-primary" (click)="descargarPDF()">
             <mat-icon>picture_as_pdf</mat-icon> Descargar Boleto
           </button>
           @if (boletoEmitido()?.factura?.pdfUrl) {
-            <button class="btn btn-outline btn-sm" (click)="descargarFactura()">
+            <button class="btn btn-outline" (click)="descargarFactura()">
               <mat-icon>receipt_long</mat-icon> Descargar Factura
             </button>
           }
-          <button class="btn btn-accent btn-sm" (click)="nuevoBoleto()">
+          <button class="btn btn-accent" (click)="nuevoBoleto()">
             <mat-icon>add</mat-icon> Nueva venta
           </button>
         </div>
