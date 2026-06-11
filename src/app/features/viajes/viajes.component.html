@@ -35,7 +35,7 @@
             <td><span class="mono">{{ v.horario.horaSalida }}</span></td>
 <td>{{ v.bus?.placa || '---' }}</td>
 <td>{{ v.choferTitular?.nombre || '---' }}</td>
-            <td><span class="mono">{{ v.totalVendidos }}/{{ v.bus?.capacidad || v.totalLibres + v.totalVendidos }}</span></td>
+            <td><span class="mono">{{ v.totalVendidos }}/{{ v.totalLibres + v.totalVendidos }}</span></td>
             <td><app-status-badge [label]="getEstadoInfo(v.estado).label" [variant]="getEstadoInfo(v.estado).variant" /></td>
             <td>
               <div class="actions">

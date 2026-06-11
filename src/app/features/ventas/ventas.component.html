@@ -114,7 +114,7 @@
                   <div class="muted seats-label">Disponibles</div>
                   <div class="seats-nums">
                     <span class="mono seats-avail" [style.color]="(t.totalLibres || 0) < 10 ? 'var(--err-600)' : 'var(--ok-700)'">{{ t.totalLibres || 0 }}</span>
-                    <span class="mono seats-total muted">/ {{ t.bus?.capacidad || '---' }}</span>
+                    <span class="mono seats-total muted">/ {{ t.totalLibres + t.totalVendidos }}</span>
                   </div>
                 </div>
                 <div class="trip-price-col">

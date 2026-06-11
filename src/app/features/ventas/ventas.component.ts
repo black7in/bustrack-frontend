@@ -18,7 +18,7 @@ import {
 
 interface RutaItem { id: string; origen: { nombre: string }; destino: { nombre: string } }
 interface TerminalItem { id: string; nombre: string }
-interface ViajeDisponible { id: string; fecha: string; horario: { horaSalida: string; ruta?: { origen?: { nombre: string }; destino?: { nombre: string } } }; bus: { placa: string; capacidad: number; numeroCarriles: number }; choferTitular: { nombre: string }; asientos: AsientoSeatMap[]; totalVendidos: number; totalLibres: number }
+interface ViajeDisponible { id: string; fecha: string; horario: { horaSalida: string; ruta?: { origen?: { nombre: string }; destino?: { nombre: string } } }; bus: { placa: string; numeroCarriles: number }; choferTitular: { nombre: string }; asientos: AsientoSeatMap[]; totalVendidos: number; totalLibres: number }
 interface ClienteEncontrado { id: string; ci: string; nombre: string; telefono?: string; email?: string }
 
 @Component({

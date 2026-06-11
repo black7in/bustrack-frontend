@@ -13,7 +13,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { VIAJES, CANCELAR_VIAJE, GENERAR_VIAJES_DEL_DIA } from '../../graphql/viajes.graphql';
 import { RUTAS } from '../../graphql/catalogo.graphql';
 
-interface ViajeItem { id: string; fecha: string; estado: string; carrilAsignado?: string; horario: { horaSalida: string; ruta: { id: string; origen: { nombre: string }; destino: { nombre: string } } }; bus?: { id: string; placa: string; capacidad: number } | null; choferTitular?: { id: string; nombre: string } | null; totalVendidos: number; totalLibres: number }
+interface ViajeItem { id: string; fecha: string; estado: string; carrilAsignado?: string; horario: { horaSalida: string; ruta: { id: string; origen: { nombre: string }; destino: { nombre: string } } }; bus?: { id: string; placa: string } | null; choferTitular?: { id: string; nombre: string } | null; totalVendidos: number; totalLibres: number }
 
 const ESTADO_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
   PROGRAMADO: { label: 'Programado', variant: 'neutral' },

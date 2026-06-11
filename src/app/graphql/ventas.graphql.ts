@@ -26,7 +26,7 @@ export const VIAJES_DISPONIBLES = gql`
       fecha
       estado
       horario { horaSalida }
-      bus { placa capacidad numeroCarriles }
+      bus { placa numeroCarriles }
       choferTitular { nombre }
       asientos { id numeroAsiento estado }
       totalVendidos
@@ -42,7 +42,7 @@ export const VIAJE_POR_ID = gql`
       fecha
       estado
       horario { horaSalida ruta { origen { nombre } destino { nombre } } }
-      bus { placa capacidad numeroCarriles }
+      bus { placa numeroCarriles }
       choferTitular { nombre }
       asientos { id numeroAsiento estado }
       totalVendidos

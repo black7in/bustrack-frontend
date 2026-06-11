@@ -9,7 +9,7 @@ export const VIAJES = gql`
         estado
         carrilAsignado
         horario { horaSalida ruta { id origen { nombre } destino { nombre } } }
-        bus { id placa capacidad }
+        bus { id placa }
         choferTitular { id nombre }
         totalVendidos
         totalLibres
@@ -27,7 +27,7 @@ export const VIAJE_DETALLE = gql`
       estado
       carrilAsignado
       horario { horaSalida ruta { id origen { nombre } destino { nombre } } }
-      bus { id placa marca modelo capacidad }
+      bus { id placa marca modelo }
       choferTitular { id nombre }
       choferAuxiliar { id nombre }
       totalVendidos

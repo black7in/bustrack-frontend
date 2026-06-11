@@ -13,7 +13,7 @@
       <div class="card info-card"><span class="il">Bus</span><span class="iv">{{ viaje().bus.placa }} ({{ viaje().bus.marca }} {{ viaje().bus.modelo }})</span></div>
       <div class="card info-card"><span class="il">Chofer titular</span><span class="iv">{{ viaje().choferTitular.nombre }}</span></div>
       <div class="card info-card"><span class="il">Chofer auxiliar</span><span class="iv">{{ viaje().choferAuxiliar?.nombre || '---' }}</span></div>
-      <div class="card info-card"><span class="il">Ocupacion</span><span class="iv mono">{{ viaje().totalVendidos }}/{{ viaje().bus.capacidad }}</span></div>
+      <div class="card info-card"><span class="il">Ocupacion</span><span class="iv mono">{{ viaje().totalVendidos }}/{{ viaje().totalLibres + viaje().totalVendidos }}</span></div>
     </div>
 
     <div class="actions-bar">
