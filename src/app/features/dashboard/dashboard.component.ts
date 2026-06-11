@@ -185,6 +185,7 @@ export class DashboardComponent implements OnInit {
 
   private loadPrediccion(): void {
     const ruta = this.viajes()[0];
+    console.log('loadPrediccion called. viajes:', this.viajes().length, 'first:', !!ruta, 'rutaId:', ruta?.horario?.ruta?.id);
     if (!ruta || !this.auth.getToken()) return;
     const rutaId = ruta.horario?.ruta?.id;
     if (!rutaId) return;
