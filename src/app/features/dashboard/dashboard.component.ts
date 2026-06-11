@@ -186,10 +186,12 @@ export class DashboardComponent implements OnInit {
   private loadPrediccion(): void {
     const ruta = this.viajes()[0];
     if (!ruta || !this.auth.getToken()) return;
+    const rutaId = ruta.horario?.ruta?.id;
+    if (!rutaId) return;
     this.http.get<any>(`${environment.iaApiUrl}/prediccion/demanda`, {
       headers: this.headers(),
-      params: { rutaId: ruta.horario.ruta.id, fecha: this.fechaInicio() },
-    }).subscribe({ next: (r) => this.prediccion.set(r) });
+      params: { rutaId, fecha: this.fechaInicio() },
+    }).subscribe({ next: (r) => this.prediccion.set(r), error: (e) => console.warn('Prediccion IA error:', e.status, e.message) });
   }
 
   private loadSegmentacion(): void {
