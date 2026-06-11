@@ -66,6 +66,16 @@ export const GENERAR_URL_SUBIDA = gql`
   }
 `;
 
+export const GUARDAR_FOTO_CHOFER = gql`
+  mutation GuardarFotoChofer($id: ID!, $s3Key: String!, $tipo: TipoArchivo!) {
+    guardarFotoChofer(id: $id, s3Key: $s3Key, tipo: $tipo) {
+      id
+      fotoPerfilUrl
+      fotoFacialUrl
+    }
+  }
+`;
+
 export const CHOFERES = gql`
   query Choferes($estado: EstadoChofer) {
     choferes(estado: $estado) {

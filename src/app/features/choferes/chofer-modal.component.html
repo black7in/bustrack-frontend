@@ -5,15 +5,26 @@
       <button class="btn-close" (click)="close()"><mat-icon>close</mat-icon></button>
     </div>
     <form [formGroup]="form" (ngSubmit)="submit()" class="modal-body">
-      <label class="photo-upload" for="fotoChofer">
-        @if (fotoPreview()) {
-          <img [src]="fotoPreview()" class="photo-preview" alt="Preview" />
-        } @else {
-          <mat-icon>person</mat-icon>
-        }
-        <span>{{ fotoFile() ? fotoFile()?.name : 'Subir foto del chofer' }}</span>
-      </label>
+      <div class="photo-row">
+        <label class="photo-upload" for="fotoChofer">
+          @if (fotoPreview()) {
+            <img [src]="fotoPreview()" class="photo-preview" alt="Preview" />
+          } @else {
+            <mat-icon>person</mat-icon>
+          }
+          <span>{{ fotoFile() ? fotoFile()?.name : 'Foto del chofer' }}</span>
+        </label>
+        <label class="photo-upload" for="fotoFacial">
+          @if (fotoFacialPreview()) {
+            <img [src]="fotoFacialPreview()" class="photo-preview" alt="Preview facial" />
+          } @else {
+            <mat-icon>face</mat-icon>
+          }
+          <span>{{ fotoFacialFile() ? fotoFacialFile()?.name : 'Foto facial' }}</span>
+        </label>
+      </div>
       <input id="fotoChofer" type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
+      <input id="fotoFacial" type="file" accept="image/*" hidden (change)="onFacialFileSelected($event)" />
       <div class="row-2">
         <div class="field"><label class="field-label">Nombre</label><input class="input" formControlName="nombre" placeholder="Edwin Mamani" /></div>
         <div class="field"><label class="field-label">CI</label><input class="input" formControlName="ci" placeholder="5478921" /></div>

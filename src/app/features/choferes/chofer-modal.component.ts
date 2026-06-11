@@ -7,7 +7,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Apollo } from 'apollo-angular';
-import { CREAR_CHOFER, GENERAR_URL_SUBIDA } from '../../graphql/flota.graphql';
+import { CREAR_CHOFER, GENERAR_URL_SUBIDA, GUARDAR_FOTO_CHOFER } from '../../graphql/flota.graphql';
 
 @Component({
   selector: 'app-chofer-modal',
@@ -27,6 +27,8 @@ export class ChoferModalComponent {
   readonly crearCuenta = signal(false);
   readonly fotoFile = signal<File | null>(null);
   readonly fotoPreview = signal('');
+  readonly fotoFacialFile = signal<File | null>(null);
+  readonly fotoFacialPreview = signal('');
 
   readonly form = this.fb.group({
     nombre: ['', Validators.required],
@@ -42,12 +44,21 @@ export class ChoferModalComponent {
   toggleAccount(): void { this.crearCuenta.update((v) => !v); }
 
   onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
+    const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
       this.fotoFile.set(file);
       const reader = new FileReader();
       reader.onload = () => this.fotoPreview.set(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  }
+
+  onFacialFileSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.fotoFacialFile.set(file);
+      const reader = new FileReader();
+      reader.onload = () => this.fotoFacialPreview.set(reader.result as string);
       reader.readAsDataURL(file);
     }
   }
@@ -71,8 +82,8 @@ export class ChoferModalComponent {
     this.apollo.mutate<any>({ mutation: CREAR_CHOFER, variables: { input } }).subscribe({
       next: (r) => {
         const newId = r.data?.crearChofer?.id;
-        if (newId && this.fotoFile()) {
-          this.subirFoto(newId);
+        if (newId && (this.fotoFile() || this.fotoFacialFile())) {
+          this.subirFotos(newId);
         } else {
           this.saving.set(false);
           this.snackBar.open('Chofer registrado', 'Cerrar', { duration: 3000 });
@@ -83,20 +94,50 @@ export class ChoferModalComponent {
     });
   }
 
-  private subirFoto(entidadId: string): void {
-    const ext = this.fotoFile()?.name.split('.').pop() || '';
-    this.apollo.mutate<any>({ mutation: GENERAR_URL_SUBIDA, variables: { tipo: 'FOTO_CHOFER', entidadId, extension: ext || null } }).subscribe({
+  private subirFotos(choferId: string): void {
+    const tareas: Array<{ file: File; tipo: string }> = [];
+    if (this.fotoFile()) tareas.push({ file: this.fotoFile()!, tipo: 'FOTO_CHOFER' });
+    if (this.fotoFacialFile()) tareas.push({ file: this.fotoFacialFile()!, tipo: 'FOTO_FACIAL' });
+    this.subirSiguiente(choferId, tareas, 0);
+  }
+
+  private subirSiguiente(choferId: string, tareas: Array<{ file: File; tipo: string }>, idx: number): void {
+    if (idx >= tareas.length) {
+      this.saving.set(false);
+      this.snackBar.open('Chofer registrado con foto', 'Cerrar', { duration: 3000 });
+      this.close(true);
+      return;
+    }
+
+    const { file, tipo } = tareas[idx];
+    const ext = file.name.split('.').pop() || null;
+
+    this.apollo.mutate<any>({ mutation: GENERAR_URL_SUBIDA, variables: { tipo, entidadId: choferId, extension: ext } }).subscribe({
       next: (r) => {
         const data = r.data?.generarUrlSubida;
-        const url = typeof data === 'string' ? data : data?.uploadUrl;
-        if (url && this.fotoFile()) {
-          this.http.put(url, this.fotoFile(), { headers: new HttpHeaders({ 'Content-Type': this.fotoFile()!.type }) }).subscribe({
-            next: () => { this.saving.set(false); this.snackBar.open('Chofer registrado con foto', 'Cerrar', { duration: 3000 }); this.close(true); },
-            error: () => { this.saving.set(false); this.snackBar.open('Creado, error al subir foto', 'Cerrar', { duration: 3000 }); this.close(true); },
-          });
-        } else { this.saving.set(false); this.close(true); }
+        const uploadUrl: string = typeof data === 'string' ? data : data?.uploadUrl;
+        const s3Key: string = data?.s3Key;
+
+        if (!uploadUrl) {
+          this.subirSiguiente(choferId, tareas, idx + 1);
+          return;
+        }
+
+        this.http.put(uploadUrl, file, { headers: new HttpHeaders({ 'Content-Type': file.type }) }).subscribe({
+          next: () => {
+            if (s3Key) {
+              this.apollo.mutate<any>({ mutation: GUARDAR_FOTO_CHOFER, variables: { id: choferId, s3Key, tipo } }).subscribe({
+                next: () => this.subirSiguiente(choferId, tareas, idx + 1),
+                error: () => this.subirSiguiente(choferId, tareas, idx + 1),
+              });
+            } else {
+              this.subirSiguiente(choferId, tareas, idx + 1);
+            }
+          },
+          error: () => this.subirSiguiente(choferId, tareas, idx + 1),
+        });
       },
-      error: () => { this.saving.set(false); this.snackBar.open('Creado, error al subir foto', 'Cerrar', { duration: 3000 }); this.close(true); },
+      error: () => this.subirSiguiente(choferId, tareas, idx + 1),
     });
   }
 }
