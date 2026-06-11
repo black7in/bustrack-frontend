@@ -68,6 +68,7 @@ export const REPORTE_INTELIGENTE = gql`
       filas
       totalFilas
       error
+      sqlGenerado
     }
   }
 `;

@@ -31,6 +31,16 @@ export class ReportesComponent {
   readonly iaQuery = signal('');
   readonly iaResult = signal<any>(null);
   readonly iaLoading = signal(false);
+  readonly iaPage = signal(1);
+  readonly iaPageSize = 50;
+  readonly Math = Math;
+
+  readonly paginatedIaRows = computed(() => {
+    const rows = this.iaResult()?.filas;
+    if (!rows) return [];
+    const start = (this.iaPage() - 1) * this.iaPageSize;
+    return rows.slice(start, start + this.iaPageSize);
+  });
   readonly resumen = signal<any>(null);
   readonly boletos = signal<BoletoItem[]>([]);
   readonly boletosTotal = signal(0);

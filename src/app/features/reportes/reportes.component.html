@@ -139,16 +139,36 @@
       }
 
       @if (iaResult() && !iaLoading()) {
-        @if (iaResult().explicacion) {
-          <div class="ia-explicacion">{{ iaResult().explicacion }}</div>
-        }
-        @if (iaResult().filas?.length > 0) {
-          <table class="tbl"><thead><tr>@for (c of iaResult().columnas; track c) {<th>{{c}}</th>}</tr></thead>
-            <tbody>@for (f of iaResult().filas; track $index) {<tr>@for (c of f; track $index) {<td>{{c}}</td>}</tr>}</tbody></table>
-          <button class="btn btn-outline btn-sm" (click)="exportarIACSV()"><mat-icon>download</mat-icon> Exportar CSV</button>
-        } @else if (!iaResult().error) {
-          <div class="empty"><mat-icon>inbox</mat-icon><span>No se encontraron resultados</span></div>
-        }
+        <div class="ia-result">
+          @if (iaResult().explicacion) {
+            <div class="ia-explicacion">
+              <span class="ia-label">Resultado</span>
+              <p>{{ iaResult().explicacion }}</p>
+            </div>
+          }
+          @if (iaResult().sqlGenerado) {
+            <div class="ia-sql">
+              <span class="ia-label">Consulta generada</span>
+              <code>{{ iaResult().sqlGenerado }}</code>
+            </div>
+          }
+          @if (iaResult().filas?.length > 0) {
+            <div class="ia-table-wrap">
+              <table class="tbl"><thead><tr>@for (c of iaResult().columnas; track c) {<th>{{c}}</th>}</tr></thead>
+                <tbody>@for (f of paginatedIaRows(); track $index) {<tr>@for (c of f; track $index) {<td>{{c}}</td>}</tr>}</tbody></table>
+            </div>
+            @if (iaResult().totalFilas > iaPageSize) {
+              <div class="pag">
+                <button class="btn btn-ghost btn-sm" [disabled]="iaPage() === 1" (click)="iaPage.set(iaPage()-1)"><mat-icon>chevron_left</mat-icon></button>
+                <span>Pag {{ iaPage() }} de {{ Math.ceil(iaResult().totalFilas / iaPageSize) }}</span>
+                <button class="btn btn-ghost btn-sm" [disabled]="iaPage() >= Math.ceil(iaResult().totalFilas / iaPageSize)" (click)="iaPage.set(iaPage()+1)"><mat-icon>chevron_right</mat-icon></button>
+              </div>
+            }
+            <button class="btn btn-outline btn-sm" (click)="exportarIACSV()" style="margin-top:8px"><mat-icon>download</mat-icon> Exportar CSV</button>
+          } @else if (!iaResult().error) {
+            <div class="empty"><mat-icon>inbox</mat-icon><span>No se encontraron resultados</span></div>
+          }
+        </div>
       }
     </div>
   }
