@@ -11,7 +11,7 @@ import { debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs/oper
 import { Subscription } from 'rxjs';
 import {
   RUTAS_ACTIVAS, VIAJES_DISPONIBLES, TARIFA_ACTUAL, VIAJE_POR_ID,
-  CLIENTE_POR_CI, CREAR_CLIENTE, VENDER_BOLETO,
+  CLIENTE_POR_CI, CREAR_CLIENTE, VENDER_BOLETO, BOLETO_POR_ID,
 } from '../../graphql/ventas.graphql';
 
 interface RutaItem { id: string; origen: { nombre: string }; destino: { nombre: string } }
@@ -254,8 +254,24 @@ export class VentasComponent implements OnInit, OnDestroy {
         variables: { input },
       }).subscribe({
         next: (r) => {
-          this.vendiendo.set(false); this.boletoEmitido.set(r.data?.venderBoleto);
-          this.snackBar.open('Boleto emitido con exito', 'Cerrar', { duration: 5000 });
+          const boletoId = r.data?.venderBoleto?.id;
+          if (boletoId) {
+            this.apollo.query<any>({ query: BOLETO_POR_ID, variables: { id: boletoId }, fetchPolicy: 'network-only' }).subscribe({
+              next: (br) => {
+                this.vendiendo.set(false);
+                this.boletoEmitido.set(br.data?.boleto ?? r.data?.venderBoleto);
+                this.snackBar.open('Boleto emitido con exito', 'Cerrar', { duration: 5000 });
+              },
+              error: () => {
+                this.vendiendo.set(false);
+                this.boletoEmitido.set(r.data?.venderBoleto);
+                this.snackBar.open('Boleto emitido con exito', 'Cerrar', { duration: 5000 });
+              },
+            });
+          } else {
+            this.vendiendo.set(false); this.boletoEmitido.set(r.data?.venderBoleto);
+            this.snackBar.open('Boleto emitido con exito', 'Cerrar', { duration: 5000 });
+          }
         },
         error: (err: any) => { this.vendiendo.set(false); this.snackBar.open(err.message || 'Error', 'Cerrar', { duration: 5000 }); },
       });
