@@ -96,22 +96,46 @@
   }
 
   <!-- Prediccion -->
-  @if (prediccion()) {
-    <div class="card pred-full">
-      <div class="pred-header">
-        <mat-icon class="pred-icon">psychology</mat-icon>
-        <div>
-          <h3>Prediccion de demanda</h3>
-          <p class="muted">{{ prediccion().rutaId }} · {{ prediccion().fecha | date:'d/M' }}</p>
-        </div>
+  <div class="card pred-full">
+    <div class="pred-header">
+      <mat-icon class="pred-icon">psychology</mat-icon>
+      <div>
+        <h3>Prediccion de demanda</h3>
+        <p class="muted">Selecciona ruta y fecha para predecir</p>
       </div>
+    </div>
+    <div class="pred-inputs">
+      <select class="inp" [(ngModel)]="predRutaId">
+        <option value="">Ruta</option>
+        @for (r of rutasIA(); track r.id) { <option [value]="r.id">{{r.origen.nombre}} → {{r.destino.nombre}}</option> }
+      </select>
+      <input class="inp" type="date" [(ngModel)]="predFecha" />
+      <button class="btn btn-primary btn-sm" (click)="predecir()" [disabled]="cargandoPred() || !predRutaId()">
+        @if (cargandoPred()) { <mat-icon class="spin">refresh</mat-icon> } Predecir
+      </button>
+      <button class="btn btn-outline btn-sm" (click)="reentrenarDemand()" [disabled]="entrenandoDemand()">
+        @if (entrenandoDemand()) { <mat-icon class="spin">refresh</mat-icon> } Reentrenar
+      </button>
+    </div>
+
+    @if (prediccion()) {
       <div class="pred-grid">
         <div class="pred-stat"><span class="ps-label">Ocupacion predicha</span><span class="ps-value mono">{{ (prediccion().ocupacionPredicha * 100).toFixed(0) }}%</span></div>
         <div class="pred-stat"><span class="ps-label">Precio sugerido</span><span class="ps-value mono">Bs {{ prediccion().precioSugerido?.toFixed(0) }}</span></div>
         <div class="pred-stat"><span class="ps-label">Ajuste</span><span class="ps-value" [style.color]="prediccion().ajustePorcentaje >= 0 ? 'var(--ok-600)' : 'var(--err-600)'">{{ prediccion().ajustePorcentaje >= 0 ? '+' : '' }}{{ prediccion().ajustePorcentaje?.toFixed(1) }}%</span></div>
         <div class="pred-stat"><span class="ps-label">Confianza</span><span class="ps-value mono">{{ (prediccion().confianza * 100).toFixed(0) }}%</span></div>
       </div>
-    </div>
-  }
+      @if (prediccion().factores) {
+        <div class="pred-factores">
+          <span class="ps-label">Factores:</span>
+          <span class="chip">{{ prediccion().factores.diaSemana }}</span>
+          @if (prediccion().factores.esFeriado) { <span class="chip">Feriado</span> }
+          <span class="chip">{{ prediccion().factores.temporada }}</span>
+          <span class="chip">Historico: {{ (prediccion().factores.historicoPromedio * 100).toFixed(0) }}%</span>
+          @if (prediccion().desdeCache) { <span class="chip cache">Cache</span> }
+        </div>
+      }
+    }
+  </div>
 
 </div>

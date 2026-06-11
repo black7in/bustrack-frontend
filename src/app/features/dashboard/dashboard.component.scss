@@ -91,6 +91,12 @@
 .pred-full { padding: 22px; }
 .pred-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
 .pred-header h3 { margin: 0; font-size: 18px; font-weight: 700; color: var(--ink-900); }
+.pred-inputs { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+.inp { height: 36px; padding: 0 10px; border-radius: var(--r-md); border: 1px solid var(--ink-200); background: var(--color-surface); font-size: 13px; color: var(--color-text-primary); font-family: inherit; }
+select.inp { cursor: pointer; }
+.pred-factores { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.chip { padding: 4px 10px; border-radius: var(--r-sm); background: var(--ink-100); font-size: 11px; font-weight: 500; color: var(--ink-600); }
+.chip.cache { background: var(--warn-100); color: var(--warn-700); }
 .pred-icon { color: var(--accent-600); font-size: 24px; width: 24px; height: 24px; }
 .pred-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .pred-stat { display: flex; flex-direction: column; gap: 4px; }

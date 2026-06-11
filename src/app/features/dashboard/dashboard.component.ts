@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { StatCardComponent } from '../../shared/components/stat-card/stat-card.component';
 import { StatusBadgeComponent, BadgeVariant } from '../../shared/components/status-badge/status-badge.component';
@@ -15,6 +16,7 @@ import { ChartDirective } from '../../shared/components/chart/chart.directive';
 import { AuthService } from '../../core/auth/auth.service';
 import { environment } from '../../../environments/environment';
 import { RESUMEN_VENTAS, VIAJES_DEL_DIA } from '../../graphql/dashboard.graphql';
+import { RUTAS } from '../../graphql/catalogo.graphql';
 
 interface ViajeItem {
   id: string;
@@ -42,7 +44,7 @@ const ESTADO_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
   standalone: true,
   imports: [
     CommonModule, DatePipe, RouterLink,
-    MatIconModule, MatButtonModule, MatMenuModule, MatSnackBarModule, MatProgressSpinnerModule,
+    MatIconModule, MatButtonModule, MatMenuModule, MatSnackBarModule, MatProgressSpinnerModule, FormsModule,
     StatCardComponent, StatusBadgeComponent, CurrencyBobPipe, ChartDirective,
   ],
   templateUrl: './dashboard.component.html',
@@ -61,6 +63,11 @@ export class DashboardComponent implements OnInit {
 
   readonly prediccion = signal<any>(null);
   readonly segmentacion = signal<any>(null);
+  readonly rutasIA = signal<any[]>([]);
+  readonly predRutaId = signal('');
+  readonly predFecha = signal(new Date().toISOString().split('T')[0]);
+  readonly entrenandoDemand = signal(false);
+  readonly cargandoPred = signal(false);
 
   readonly segmentacionChart = computed(() => {
     const s = this.segmentacion();
@@ -196,22 +203,42 @@ export class DashboardComponent implements OnInit {
         complete: () => this.loading.set(false),
       });
 
-    this.loadPrediccion();
     this.loadSegmentacion();
+    this.loadRutasIA();
+  }
+
+  private loadRutasIA(): void {
+    this.apollo.query<any>({ query: RUTAS, fetchPolicy: 'network-only' }).subscribe({
+      next: (r) => { if (r.data?.rutas) this.rutasIA.set(r.data.rutas); },
+    });
   }
 
   private headers() { return new HttpHeaders().set('Authorization', `Bearer ${this.auth.getToken()}`); }
   private ops(path: string) { return `${environment.operacionesApiUrl}${path}`; }
 
-  private loadPrediccion(): void {
+  predecir(): void {
     const token = this.auth.getToken();
-    if (!token) return;
-    const ruta = this.viajes()[0];
-    const rutaId = ruta?.horario?.ruta?.id;
+    const rutaId = this.predRutaId();
+    if (!token || !rutaId) return;
+    this.cargandoPred.set(true);
     this.http.get<any>(`${environment.iaApiUrl}/prediccion/demanda`, {
       headers: this.headers(),
-      params: { rutaId: rutaId || 'default', fecha: this.fechaInicio() },
-    }).subscribe({ next: (r) => this.prediccion.set(r), error: (e) => console.warn('Prediccion IA:', e.status) });
+      params: { rutaId, fecha: this.predFecha() },
+    }).subscribe({
+      next: (r) => { this.cargandoPred.set(false); this.prediccion.set(r); },
+      error: (e) => { this.cargandoPred.set(false); console.warn('Prediccion IA:', e.status); },
+    });
+  }
+
+  reentrenarDemand(): void {
+    this.entrenandoDemand.set(true);
+    this.http.post<any>(`${environment.iaApiUrl}/modelos/reentrenar`, { modelo: 'demand' }, { headers: this.headers() }).subscribe({
+      next: (r) => {
+        this.entrenandoDemand.set(false);
+        this.snackBar.open('Reentrenado: ' + (r.entrenados?.join(', ') || ''), 'Cerrar', { duration: 3000 });
+      },
+      error: (e) => { this.entrenandoDemand.set(false); this.snackBar.open('Error: ' + e.message, 'Cerrar', { duration: 3000 }); },
+    });
   }
 
   private loadSegmentacion(): void {
