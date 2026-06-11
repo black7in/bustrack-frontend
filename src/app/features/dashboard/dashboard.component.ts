@@ -23,7 +23,7 @@ interface ViajeItem {
   estado: string;
 }
 
-type Periodo = 'hoy' | 'semana' | 'mes';
+type Periodo = 'hoy' | 'semana' | 'mes' | 'mes-anterior';
 
 const ESTADO_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
   in_route: { label: 'En ruta', variant: 'info' },
@@ -79,6 +79,7 @@ export class DashboardComponent implements OnInit {
       d.setDate(d.getDate() + diff);
       return this.fmt(d);
     }
+    if (p === 'mes-anterior') return this.fmt(new Date(this.today.getFullYear(), this.today.getMonth() - 1, 1));
     return this.fmt(new Date(this.today.getFullYear(), this.today.getMonth(), 1));
   });
 
@@ -88,6 +89,10 @@ export class DashboardComponent implements OnInit {
       const lastDay = new Date(this.today.getFullYear(), this.today.getMonth() + 1, 0);
       return this.fmt(lastDay);
     }
+    if (p === 'mes-anterior') {
+      const lastDay = new Date(this.today.getFullYear(), this.today.getMonth(), 0);
+      return this.fmt(lastDay);
+    }
     return this.fmt(this.today);
   });
 
@@ -95,6 +100,7 @@ export class DashboardComponent implements OnInit {
     const p = this.periodo();
     if (p === 'hoy') return 'Hoy';
     if (p === 'semana') return 'Ultimos 7 dias';
+    if (p === 'mes-anterior') return 'Mes anterior';
     return 'Este mes';
   });
 
