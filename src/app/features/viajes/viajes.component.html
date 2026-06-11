@@ -44,7 +44,12 @@
                 @if (v.estado === 'PROGRAMADO') {
                   <button class="btn btn-ghost btn-icon" (click)="cancelar(v.id)" title="Cancelar"><mat-icon style="color:var(--err-600)">cancel</mat-icon></button>
                 }
-    </div>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
 
     @if (total() > pageSize) {
       <div class="pag">
@@ -53,10 +58,6 @@
         <button class="btn btn-ghost btn-sm" [disabled]="page() >= Math.ceil(total() / pageSize)" (click)="page.set(page()+1); loadViajes()"><mat-icon>chevron_right</mat-icon></button>
       </div>
     }
-            </td>
-          </tr>
-        }
-      </tbody>
     </table>
   </div>
 </div>
