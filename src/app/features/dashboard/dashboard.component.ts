@@ -180,14 +180,14 @@ export class DashboardComponent implements OnInit {
   private loadPrediccion(): void {
     const ruta = this.viajes()[0];
     if (!ruta) return;
-    this.http.get<any>(this.ops('/prediccion/demanda'), {
+    this.http.get<any>(`${environment.iaApiUrl}/prediccion/demanda`, {
       headers: this.headers(),
       params: { rutaId: ruta.horario.ruta.origen.nombre + '-' + ruta.horario.ruta.destino.nombre, fecha: this.fechaInicio() },
     }).subscribe({ next: (r) => this.prediccion.set(r) });
   }
 
   private loadSegmentacion(): void {
-    this.http.get<any>(this.ops('/segmentacion/clientes'), { headers: this.headers() }).subscribe({ next: (r) => this.segmentacion.set(r) });
+    this.http.get<any>(`${environment.iaApiUrl}/segmentacion/clientes`, { headers: this.headers() }).subscribe({ next: (r) => this.segmentacion.set(r) });
   }
 
   getEstadoInfo(estado: string): { label: string; variant: BadgeVariant } {
