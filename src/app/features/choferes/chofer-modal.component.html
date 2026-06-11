@@ -40,18 +40,6 @@
         <div class="field"><label class="field-label">Vencimiento</label><input class="input" type="date" formControlName="licenciaVence" /></div>
       </div>
 
-      @if (isEdit()) {
-        <div class="field">
-          <label class="field-label">Estado</label>
-          <select class="input" formControlName="estado">
-            <option value="DISPONIBLE">Disponible</option>
-            <option value="EN_VIAJE">En viaje</option>
-            <option value="DESCANSANDO">Descansando</option>
-            <option value="INACTIVO">Inactivo</option>
-          </select>
-        </div>
-      }
-
       @if (!isEdit()) {
         <div class="field checkbox-field" (click)="toggleAccount()">
           <span class="checkbox" [class.checked]="crearCuenta()"></span>

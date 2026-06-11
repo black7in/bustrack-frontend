@@ -93,7 +93,6 @@ export class ChoferModalComponent implements OnInit {
       const input: any = {
         nombre: val.nombre, ci: val.ci, telefono: val.telefono || null,
         licenciaCategoria: val.licenciaCategoria, licenciaNumero: val.licenciaNumero, licenciaVence: val.licenciaVence,
-        estado: val.estado,
       };
       this.apollo.mutate<any>({ mutation: ACTUALIZAR_CHOFER, variables: { id: this.data.id, input } }).subscribe({
         next: () => {
