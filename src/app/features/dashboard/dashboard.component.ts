@@ -164,13 +164,13 @@ export class DashboardComponent implements OnInit {
         next: (result) => {
           if (result.data?.viajes?.items) {
             this.viajes.set(result.data.viajes.items);
+            this.loadPrediccion();
           }
         },
         error: () => this.loading.set(false),
         complete: () => this.loading.set(false),
       });
 
-    this.loadPrediccion();
     this.loadSegmentacion();
   }
 
