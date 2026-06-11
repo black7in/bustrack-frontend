@@ -75,7 +75,7 @@ export class ReportesComponent {
     tooltip: { trigger: 'axis' as const, formatter: '{b}<br/>Ocupacion: {c}%' },
     grid: { left: 50, right: 20, top: 20, bottom: 30 },
     xAxis: { type: 'category' as const, data: ['Sin datos'], axisLabel: { color: '#6B7480', fontSize: 10 } },
-    yAxis: { type: 'value' as const, min: 0, max: 100, axisLabel: { color: '#6B7480', fontSize: 10, formatter: '{value}%' }, splitLine: { lineStyle: { color: '#EEF1F5' } } },
+    yAxis: { type: 'value' as const, min: 0, axisLabel: { color: '#6B7480', fontSize: 10, formatter: '{value}%' }, splitLine: { lineStyle: { color: '#EEF1F5' } } },
     series: [
       { type: 'line', data: [0], smooth: true, areaStyle: { color: '#E5EEF6' }, lineStyle: { color: '#1E4E78', width: 2 }, itemStyle: { color: '#1E4E78' }, symbolSize: 4 },
       { type: 'line', data: [], markLine: { silent: true, data: [{ yAxis: 80 }], lineStyle: { color: '#F59E0B', type: 'dashed', width: 1.5 }, label: { formatter: '80%', position: 'end', fontSize: 10, color: '#F59E0B' } } },
@@ -242,13 +242,14 @@ export class ReportesComponent {
   private buildOcupacionChart(): void {
     const data = this.ocupacionData();
     const fechas = data.map((d: any) => new Date(d.fecha).toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit' }));
-    const pcts = data.map((d: any) => d.porcentaje);
+    const pcts = data.map((d: any) => Math.round(d.porcentaje * 100) / 100);
+    const avg = pcts.length ? Math.round(pcts.reduce((a, b) => a + b, 0) / pcts.length) : 80;
     this.ocupacionChartOptions.set({
       ...this.ocupacionChartOptions(),
       xAxis: { ...this.ocupacionChartOptions().xAxis, data: fechas.length ? fechas : ['Sin datos'] },
       series: [
         { ...this.ocupacionChartOptions().series[0], data: pcts.length ? pcts : [0] },
-        this.ocupacionChartOptions().series[1],
+        { ...this.ocupacionChartOptions().series[1], markLine: { ...this.ocupacionChartOptions().series[1].markLine, data: [{ yAxis: avg }], label: { formatter: avg + '%', position: 'end', fontSize: 10, color: '#F59E0B' } } },
       ],
     });
   }
