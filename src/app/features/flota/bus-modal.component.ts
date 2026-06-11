@@ -32,7 +32,6 @@ export class BusModalComponent {
     marca: ['', Validators.required],
     modelo: ['', Validators.required],
     anio: [2024, [Validators.required, Validators.min(1990)]],
-    capacidad: [44, [Validators.required, Validators.min(1)]],
     numeroCarriles: [3, [Validators.required, Validators.min(1)]],
   });
 
@@ -53,7 +52,7 @@ export class BusModalComponent {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.saving.set(true);
     const val = this.form.value;
-    const input: any = { placa: val.placa, marca: val.marca, modelo: val.modelo, anio: Number(val.anio), capacidad: Number(val.capacidad), numeroCarriles: Number(val.numeroCarriles) };
+    const input: any = { placa: val.placa, marca: val.marca, modelo: val.modelo, anio: Number(val.anio), numeroCarriles: Number(val.numeroCarriles) };
 
     this.apollo.mutate<any>({ mutation: CREAR_BUS, variables: { input } }).subscribe({
       next: (r) => {

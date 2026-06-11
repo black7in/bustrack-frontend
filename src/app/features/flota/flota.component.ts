@@ -8,7 +8,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { StatusBadgeComponent, BadgeVariant } from '../../shared/components/status-badge/status-badge.component';
 import { BUSES } from '../../graphql/flota.graphql';
 
-interface BusItem { id: string; placa: string; marca: string; modelo: string; anio: number; capacidad: number; numeroCarriles: number; estadoMecanico: string; fotoUrl?: string }
+interface BusItem { id: string; placa: string; marca: string; modelo: string; anio: number; numeroCarriles: number; estadoMecanico: string; fotoUrl?: string }
 
 const ESTADO_BUS_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
   OPERATIVO: { label: 'Operativo', variant: 'ok' },

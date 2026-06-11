@@ -8,7 +8,6 @@ export const BUSES = gql`
       marca
       modelo
       anio
-      capacidad
       numeroCarriles
       estadoMecanico
       fotoUrl
@@ -24,7 +23,6 @@ export const BUS_POR_ID = gql`
       marca
       modelo
       anio
-      capacidad
       numeroCarriles
       estadoMecanico
       fotoUrl
