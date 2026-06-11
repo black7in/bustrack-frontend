@@ -20,7 +20,7 @@ import { BUSES, CHOFERES } from '../../graphql/flota.graphql';
       <form [formGroup]="form" (ngSubmit)="submit()" class="mb">
         <div class="f"><label class="fl">Ruta</label><select class="inp" formControlName="rutaId" (change)="onRutaChange($any($event.target).value)"><option value="">Seleccionar</option><option *ngFor="let r of rutas()" [value]="r.id">{{r.origen.nombre}} → {{r.destino.nombre}}</option></select></div>
         <div class="f"><label class="fl">Horario</label><select class="inp" formControlName="horarioId"><option value="">Seleccionar</option><option *ngFor="let h of horarios()" [value]="h.id">{{h.horaSalida}}</option></select></div>
-        <div class="f"><label class="fl">Fecha</label><input class="inp" type="date" formControlName="fecha" /></div>
+        <div class="f"><label class="fl">Fecha</label><input class="inp" type="date" formControlName="fecha" [style.opacity]="isEdit() ? '0.5' : '1'" /></div>
         <div class="f"><label class="fl">Bus</label><select class="inp" formControlName="busId"><option value="">Seleccionar</option><option *ngFor="let b of buses()" [value]="b.id">{{b.placa}}</option></select></div>
         <div class="row2"><div class="f"><label class="fl">Chofer titular</label><select class="inp" formControlName="choferTitularId"><option value="">Seleccionar</option><option *ngFor="let c of choferes()" [value]="c.id">{{c.nombre}}</option></select></div>
         <div class="f"><label class="fl">Chofer auxiliar</label><select class="inp" formControlName="choferAuxiliarId"><option value="">Ninguno</option><option *ngFor="let c of choferes()" [value]="c.id">{{c.nombre}}</option></select></div></div>
@@ -68,7 +68,14 @@ export class ViajeModalComponent implements OnInit {
         choferAuxiliarId: this.data.choferAuxiliar?.id || '',
         carrilAsignado: this.data.carrilAsignado || '',
       });
-      if (this.data.horario?.ruta?.id) this.onRutaChange(this.data.horario.ruta.id);
+      this.form.get('rutaId')?.disable();
+      this.form.get('horarioId')?.disable();
+      this.form.get('fecha')?.disable();
+      if (this.data.horario?.ruta?.id) {
+        this.apollo.query<any>({ query: HORARIOS_POR_RUTA, variables: { rutaId: this.data.horario.ruta.id }, fetchPolicy: 'network-only' }).subscribe({
+          next: (r) => { if (r.data?.horarios) this.horarios.set(r.data.horarios); },
+        });
+      }
     }
   }
 
