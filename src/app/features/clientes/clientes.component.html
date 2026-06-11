@@ -37,6 +37,12 @@
           <div class="contact-row"><mat-icon>call</mat-icon><span>{{ clienteSeleccionado()?.telefono || 'Sin telefono' }}</span></div>
           <div class="contact-row"><mat-icon>mail</mat-icon><span>{{ clienteSeleccionado()?.email || 'Sin email' }}</span></div>
         </div>
+        @if (clienteSegmento()) {
+          <div class="segment-badge" [style.background]="'var(--brand-050)'">
+            <mat-icon>psychology</mat-icon>
+            <span>{{ clienteSegmento().segmentoNombre }} · {{ (clienteSegmento().confianza * 100).toFixed(0) }}% confianza</span>
+          </div>
+        }
         <h4 class="section-title">Historial de boletos</h4>
         @if (boletos().length > 0) {
           <div class="boleto-list">

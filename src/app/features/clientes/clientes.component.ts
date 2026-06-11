@@ -6,6 +6,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AuthService } from '../../core/auth/auth.service';
+import { environment } from '../../../environments/environment';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { CLIENTES, BOLETOS_POR_CLIENTE } from '../../graphql/clientes.graphql';
@@ -22,12 +25,16 @@ interface BoletoItem { id: string; fechaVenta: string; precioPagado: number; est
 })
 export class ClientesComponent {
   private apollo = inject(Apollo);
+  private http = inject(HttpClient);
+  private auth = inject(AuthService);
   private snackBar = inject(MatSnackBar);
 
   readonly clientes = signal<ClienteItem[]>([]);
   readonly clienteSeleccionado = signal<ClienteItem | null>(null);
   readonly boletos = signal<BoletoItem[]>([]);
   readonly loading = signal(false);
+  readonly clienteSegmento = signal<any>(null);
+
   readonly searchTerm = signal('');
   private search$ = new Subject<string>();
 
@@ -61,14 +68,27 @@ export class ClientesComponent {
   verBoletos(cliente: ClienteItem): void {
     this.clienteSeleccionado.set(cliente);
     this.boletos.set([]);
+    this.clienteSegmento.set(null);
     this.apollo.query<any>({
       query: BOLETOS_POR_CLIENTE,
       variables: { clienteId: cliente.id },
       fetchPolicy: 'network-only',
     }).subscribe({
-      next: (r) => { if (r.data?.boletos?.items) this.boletos.set(r.data.boletos.items); },
+      next: (r) => { if (r.data?.boletos) this.boletos.set(r.data.boletos); },
       error: (err) => this.snackBar.open(err.message || 'Error al cargar boletos', 'Cerrar', { duration: 3000 }),
     });
+    const token = this.auth.getToken();
+    if (token) {
+      this.http.get<any>(`${environment.iaApiUrl}/segmentacion/cliente/${cliente.id}`, {
+        headers: new HttpHeaders().set('Authorization', `Bearer ${token}`),
+      }).subscribe({ next: (r) => this.clienteSegmento.set(r) });
+    }
+  }
+
+  cerrarDetalle(): void {
+    this.clienteSeleccionado.set(null);
+    this.boletos.set([]);
+    this.clienteSegmento.set(null);
   }
 
   cerrarDetalle(): void {
