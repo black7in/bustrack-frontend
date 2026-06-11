@@ -66,6 +66,21 @@ export const GENERAR_URL_SUBIDA = gql`
   }
 `;
 
+export const ACTUALIZAR_CHOFER = gql`
+  mutation ActualizarChofer($id: ID!, $input: ActualizarChoferInput!) {
+    actualizarChofer(id: $id, input: $input) {
+      id
+      nombre
+      ci
+      telefono
+      licenciaNumero
+      licenciaCategoria
+      licenciaVence
+      estado
+    }
+  }
+`;
+
 export const GUARDAR_FOTO_CHOFER = gql`
   mutation GuardarFotoChofer($id: ID!, $s3Key: String!, $tipo: TipoArchivo!) {
     guardarFotoChofer(id: $id, s3Key: $s3Key, tipo: $tipo) {

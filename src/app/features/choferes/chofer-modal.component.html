@@ -1,10 +1,11 @@
 <div class="modal-overlay" (click)="close()">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3>Registrar nuevo chofer</h3>
+      <h3>{{ isEdit() ? 'Editar chofer' : 'Registrar nuevo chofer' }}</h3>
       <button class="btn-close" (click)="close()"><mat-icon>close</mat-icon></button>
     </div>
     <form [formGroup]="form" (ngSubmit)="submit()" class="modal-body">
+
       <div class="photo-row">
         <label class="photo-upload" for="fotoChofer">
           @if (fotoPreview()) {
@@ -12,7 +13,7 @@
           } @else {
             <mat-icon>person</mat-icon>
           }
-          <span>{{ fotoFile() ? fotoFile()?.name : 'Foto del chofer' }}</span>
+          <span>{{ fotoFile() ? fotoFile()!.name : (isEdit() ? 'Cambiar foto perfil' : 'Foto del chofer') }}</span>
         </label>
         <label class="photo-upload" for="fotoFacial">
           @if (fotoFacialPreview()) {
@@ -20,11 +21,12 @@
           } @else {
             <mat-icon>face</mat-icon>
           }
-          <span>{{ fotoFacialFile() ? fotoFacialFile()?.name : 'Foto facial' }}</span>
+          <span>{{ fotoFacialFile() ? fotoFacialFile()!.name : (isEdit() ? 'Cambiar foto facial' : 'Foto facial') }}</span>
         </label>
       </div>
       <input id="fotoChofer" type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
       <input id="fotoFacial" type="file" accept="image/*" hidden (change)="onFacialFileSelected($event)" />
+
       <div class="row-2">
         <div class="field"><label class="field-label">Nombre</label><input class="input" formControlName="nombre" placeholder="Edwin Mamani" /></div>
         <div class="field"><label class="field-label">CI</label><input class="input" formControlName="ci" placeholder="5478921" /></div>
@@ -34,23 +36,39 @@
         <div class="field"><label class="field-label">Licencia nro</label><input class="input" formControlName="licenciaNumero" placeholder="LC-12345" /></div>
       </div>
       <div class="row-2">
-        <div class="field"><label class="field-label">Categoria</label><input class="input" formControlName="licenciaCategoria" placeholder="C-PROF" /></div>
+        <div class="field"><label class="field-label">Categoría</label><input class="input" formControlName="licenciaCategoria" placeholder="C-PROF" /></div>
         <div class="field"><label class="field-label">Vencimiento</label><input class="input" type="date" formControlName="licenciaVence" /></div>
       </div>
-      <div class="field checkbox-field" (click)="toggleAccount()">
-        <span class="checkbox" [class.checked]="crearCuenta()"></span>
-        <span class="field-label" style="margin:0">Crear cuenta de acceso al sistema</span>
-      </div>
-      @if (crearCuenta()) {
-        <div class="row-2">
-          <div class="field"><label class="field-label">Email</label><input class="input" formControlName="emailUsuario" placeholder="chofer@bustrack.com" /></div>
-          <div class="field"><label class="field-label">Password</label><input class="input" type="password" formControlName="passwordUsuario" placeholder="********" /></div>
+
+      @if (isEdit()) {
+        <div class="field">
+          <label class="field-label">Estado</label>
+          <select class="input" formControlName="estado">
+            <option value="DISPONIBLE">Disponible</option>
+            <option value="EN_VIAJE">En viaje</option>
+            <option value="DESCANSANDO">Descansando</option>
+            <option value="INACTIVO">Inactivo</option>
+          </select>
         </div>
       }
+
+      @if (!isEdit()) {
+        <div class="field checkbox-field" (click)="toggleAccount()">
+          <span class="checkbox" [class.checked]="crearCuenta()"></span>
+          <span class="field-label" style="margin:0">Crear cuenta de acceso al sistema</span>
+        </div>
+        @if (crearCuenta()) {
+          <div class="row-2">
+            <div class="field"><label class="field-label">Email</label><input class="input" formControlName="emailUsuario" placeholder="chofer@bustrack.com" /></div>
+            <div class="field"><label class="field-label">Password</label><input class="input" type="password" formControlName="passwordUsuario" placeholder="********" /></div>
+          </div>
+        }
+      }
+
       <div class="modal-footer">
         <button type="button" class="btn btn-ghost btn-sm" (click)="close()">Cancelar</button>
         <button type="submit" class="btn btn-primary btn-sm" [disabled]="saving()">
-          {{ saving() ? 'Guardando...' : 'Guardar chofer' }}
+          {{ saving() ? 'Guardando...' : (isEdit() ? 'Guardar cambios' : 'Guardar chofer') }}
         </button>
       </div>
     </form>

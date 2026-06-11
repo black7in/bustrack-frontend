@@ -50,6 +50,7 @@
 
 .detail-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--color-divider); }
 .detail-header h3 { margin: 0; font-size: 14px; font-weight: 700; color: var(--ink-900); }
+.detail-header-actions { display: flex; align-items: center; gap: 8px; }
 
 .detail-loading { display: flex; align-items: center; gap: 10px; padding: 32px; color: var(--color-text-secondary); font-size: 13px; }
 .detail-loading mat-icon { color: var(--brand-600); }

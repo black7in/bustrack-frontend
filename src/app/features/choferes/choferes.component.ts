@@ -79,4 +79,17 @@ export class ChoferesComponent {
       });
     });
   }
+
+  editarChofer(): void {
+    const d = this.detalle();
+    if (!d) return;
+    import('./chofer-modal.component').then((m) => {
+      this.dialog.open(m.ChoferModalComponent, { width: '520px', data: d }).afterClosed().subscribe((r) => {
+        if (r) {
+          this.loadChoferes();
+          this.verDetalle(d.id);
+        }
+      });
+    });
+  }
 }

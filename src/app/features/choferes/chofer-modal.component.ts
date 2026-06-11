@@ -1,13 +1,13 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Apollo } from 'apollo-angular';
-import { CREAR_CHOFER, GENERAR_URL_SUBIDA, GUARDAR_FOTO_CHOFER } from '../../graphql/flota.graphql';
+import { CREAR_CHOFER, ACTUALIZAR_CHOFER, GENERAR_URL_SUBIDA, GUARDAR_FOTO_CHOFER } from '../../graphql/flota.graphql';
 
 @Component({
   selector: 'app-chofer-modal',
@@ -16,13 +16,15 @@ import { CREAR_CHOFER, GENERAR_URL_SUBIDA, GUARDAR_FOTO_CHOFER } from '../../gra
   templateUrl: './chofer-modal.component.html',
   styleUrl: './chofer-modal.component.scss',
 })
-export class ChoferModalComponent {
+export class ChoferModalComponent implements OnInit {
   private fb = inject(FormBuilder);
   private apollo = inject(Apollo);
   private http = inject(HttpClient);
   private snackBar = inject(MatSnackBar);
   private dialogRef = inject(MatDialogRef<ChoferModalComponent>);
+  readonly data = inject(MAT_DIALOG_DATA, { optional: true }) as any;
 
+  readonly isEdit = signal(!!this.data);
   readonly saving = signal(false);
   readonly crearCuenta = signal(false);
   readonly fotoFile = signal<File | null>(null);
@@ -37,9 +39,26 @@ export class ChoferModalComponent {
     licenciaNumero: ['', Validators.required],
     licenciaCategoria: ['C-PROF', Validators.required],
     licenciaVence: ['', Validators.required],
+    estado: ['DISPONIBLE'],
     emailUsuario: [''],
     passwordUsuario: [''],
   });
+
+  ngOnInit(): void {
+    if (this.data) {
+      this.form.patchValue({
+        nombre: this.data.nombre ?? '',
+        ci: this.data.ci ?? '',
+        telefono: this.data.telefono ?? '',
+        licenciaNumero: this.data.licenciaNumero ?? '',
+        licenciaCategoria: this.data.licenciaCategoria ?? 'C-PROF',
+        licenciaVence: this.data.licenciaVence ?? '',
+        estado: this.data.estado ?? 'DISPONIBLE',
+      });
+      if (this.data.fotoPerfilUrl) this.fotoPreview.set(this.data.fotoPerfilUrl);
+      if (this.data.fotoFacialUrl) this.fotoFacialPreview.set(this.data.fotoFacialUrl);
+    }
+  }
 
   toggleAccount(): void { this.crearCuenta.update((v) => !v); }
 
@@ -69,29 +88,49 @@ export class ChoferModalComponent {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.saving.set(true);
     const val = this.form.value;
-    const input: any = {
-      nombre: val.nombre, ci: val.ci, telefono: val.telefono,
-      licenciaCategoria: val.licenciaCategoria, licenciaNumero: val.licenciaNumero, licenciaVence: val.licenciaVence,
-    };
-    if (this.crearCuenta() && val.emailUsuario && val.passwordUsuario) {
-      input.crearUsuario = true;
-      input.emailUsuario = val.emailUsuario;
-      input.passwordUsuario = val.passwordUsuario;
-    }
 
-    this.apollo.mutate<any>({ mutation: CREAR_CHOFER, variables: { input } }).subscribe({
-      next: (r) => {
-        const newId = r.data?.crearChofer?.id;
-        if (newId && (this.fotoFile() || this.fotoFacialFile())) {
-          this.subirFotos(newId);
-        } else {
-          this.saving.set(false);
-          this.snackBar.open('Chofer registrado', 'Cerrar', { duration: 3000 });
-          this.close(true);
-        }
-      },
-      error: (err) => { this.saving.set(false); this.snackBar.open(err.message || 'Error', 'Cerrar', { duration: 3000 }); },
-    });
+    if (this.isEdit()) {
+      const input: any = {
+        nombre: val.nombre, ci: val.ci, telefono: val.telefono || null,
+        licenciaCategoria: val.licenciaCategoria, licenciaNumero: val.licenciaNumero, licenciaVence: val.licenciaVence,
+        estado: val.estado,
+      };
+      this.apollo.mutate<any>({ mutation: ACTUALIZAR_CHOFER, variables: { id: this.data.id, input } }).subscribe({
+        next: () => {
+          if (this.fotoFile() || this.fotoFacialFile()) {
+            this.subirFotos(this.data.id);
+          } else {
+            this.saving.set(false);
+            this.snackBar.open('Chofer actualizado', 'Cerrar', { duration: 3000 });
+            this.close(true);
+          }
+        },
+        error: (err: any) => { this.saving.set(false); this.snackBar.open(err.message || 'Error', 'Cerrar', { duration: 3000 }); },
+      });
+    } else {
+      const input: any = {
+        nombre: val.nombre, ci: val.ci, telefono: val.telefono,
+        licenciaCategoria: val.licenciaCategoria, licenciaNumero: val.licenciaNumero, licenciaVence: val.licenciaVence,
+      };
+      if (this.crearCuenta() && val.emailUsuario && val.passwordUsuario) {
+        input.crearUsuario = true;
+        input.emailUsuario = val.emailUsuario;
+        input.passwordUsuario = val.passwordUsuario;
+      }
+      this.apollo.mutate<any>({ mutation: CREAR_CHOFER, variables: { input } }).subscribe({
+        next: (r) => {
+          const newId = r.data?.crearChofer?.id;
+          if (newId && (this.fotoFile() || this.fotoFacialFile())) {
+            this.subirFotos(newId);
+          } else {
+            this.saving.set(false);
+            this.snackBar.open('Chofer registrado', 'Cerrar', { duration: 3000 });
+            this.close(true);
+          }
+        },
+        error: (err: any) => { this.saving.set(false); this.snackBar.open(err.message || 'Error', 'Cerrar', { duration: 3000 }); },
+      });
+    }
   }
 
   private subirFotos(choferId: string): void {
@@ -104,25 +143,18 @@ export class ChoferModalComponent {
   private subirSiguiente(choferId: string, tareas: Array<{ file: File; tipo: string }>, idx: number): void {
     if (idx >= tareas.length) {
       this.saving.set(false);
-      this.snackBar.open('Chofer registrado con foto', 'Cerrar', { duration: 3000 });
+      this.snackBar.open(this.isEdit() ? 'Chofer actualizado con foto' : 'Chofer registrado con foto', 'Cerrar', { duration: 3000 });
       this.close(true);
       return;
     }
-
     const { file, tipo } = tareas[idx];
     const ext = file.name.split('.').pop() || null;
-
     this.apollo.mutate<any>({ mutation: GENERAR_URL_SUBIDA, variables: { tipo, entidadId: choferId, extension: ext } }).subscribe({
       next: (r) => {
         const data = r.data?.generarUrlSubida;
         const uploadUrl: string = typeof data === 'string' ? data : data?.uploadUrl;
         const s3Key: string = data?.s3Key;
-
-        if (!uploadUrl) {
-          this.subirSiguiente(choferId, tareas, idx + 1);
-          return;
-        }
-
+        if (!uploadUrl) { this.subirSiguiente(choferId, tareas, idx + 1); return; }
         this.http.put(uploadUrl, file, { headers: new HttpHeaders({ 'Content-Type': file.type }) }).subscribe({
           next: () => {
             if (s3Key) {
@@ -130,9 +162,7 @@ export class ChoferModalComponent {
                 next: () => this.subirSiguiente(choferId, tareas, idx + 1),
                 error: () => this.subirSiguiente(choferId, tareas, idx + 1),
               });
-            } else {
-              this.subirSiguiente(choferId, tareas, idx + 1);
-            }
+            } else { this.subirSiguiente(choferId, tareas, idx + 1); }
           },
           error: () => this.subirSiguiente(choferId, tareas, idx + 1),
         });

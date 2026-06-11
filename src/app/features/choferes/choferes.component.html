@@ -61,7 +61,10 @@
       <div class="detail-panel card">
         <div class="detail-header">
           <h3>Detalle del chofer</h3>
-          <button class="icon-btn" (click)="cerrarDetalle()"><mat-icon>close</mat-icon></button>
+          <div class="detail-header-actions">
+            <button class="btn btn-primary btn-sm" (click)="editarChofer()"><mat-icon>edit</mat-icon> Editar</button>
+            <button class="icon-btn" (click)="cerrarDetalle()"><mat-icon>close</mat-icon></button>
+          </div>
         </div>
 
         @if (loadingDetalle()) {
