@@ -21,12 +21,9 @@ export const VIAJES_DEL_DIA = gql`
         horario {
           horaSalida
           ruta {
-            origen {
-              nombre
-            }
-            destino {
-              nombre
-            }
+            id
+            origen { nombre }
+            destino { nombre }
           }
         }
         bus {

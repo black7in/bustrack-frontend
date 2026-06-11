@@ -15,7 +15,7 @@ import { RESUMEN_VENTAS, VIAJES_DEL_DIA } from '../../graphql/dashboard.graphql'
 
 interface ViajeItem {
   id: string;
-  horario: { horaSalida: string; ruta: { origen: { nombre: string }; destino: { nombre: string } } };
+  horario: { horaSalida: string; ruta: { id: string; origen: { nombre: string }; destino: { nombre: string } } };
   bus: { placa: string };
   choferTitular: { nombre: string };
   totalVendidos: number;
@@ -188,7 +188,7 @@ export class DashboardComponent implements OnInit {
     if (!ruta || !this.auth.getToken()) return;
     this.http.get<any>(`${environment.iaApiUrl}/prediccion/demanda`, {
       headers: this.headers(),
-      params: { rutaId: ruta.horario.ruta.origen.nombre + '-' + ruta.horario.ruta.destino.nombre, fecha: this.fechaInicio() },
+      params: { rutaId: ruta.horario.ruta.id, fecha: this.fechaInicio() },
     }).subscribe({ next: (r) => this.prediccion.set(r) });
   }
 
