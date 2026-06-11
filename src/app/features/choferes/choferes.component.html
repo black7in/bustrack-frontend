@@ -18,31 +18,106 @@
     </div>
   </div>
 
-  <div class="card table-card">
-    <div class="table-header">
-      <span class="muted">{{ choferes().length }} choferes</span>
-      <button class="btn btn-accent btn-sm" (click)="abrirModal()"><mat-icon>add</mat-icon> Registrar chofer</button>
+  <div class="main-layout">
+    <div class="card table-card">
+      <div class="table-header">
+        <span class="muted">{{ choferes().length }} choferes</span>
+        <button class="btn btn-accent btn-sm" (click)="abrirModal()"><mat-icon>add</mat-icon> Registrar chofer</button>
+      </div>
+      <table class="tbl">
+        <thead><tr><th>Nombre</th><th>CI</th><th>Licencia</th><th>Categoria</th><th>Vencimiento</th><th>Telefono</th><th>Estado</th><th></th></tr></thead>
+        <tbody>
+          @for (c of choferes(); track c.id) {
+            <tr [class.warn]="licenciaUrgente(c.licenciaVence)" [class.selected]="detalle()?.id === c.id" (click)="verDetalle(c.id)">
+              <td>
+                <div class="nombre-cell">
+                  @if (c.fotoPerfilUrl) {
+                    <img [src]="c.fotoPerfilUrl" class="avatar" [alt]="c.nombre" />
+                  } @else {
+                    <div class="avatar-placeholder"><mat-icon>person</mat-icon></div>
+                  }
+                  <span class="fw600">{{ c.nombre }}</span>
+                </div>
+              </td>
+              <td><span class="mono">{{ c.ci }}</span></td>
+              <td><span class="badge-mini">{{ c.licenciaNumero }}</span></td>
+              <td>{{ c.licenciaCategoria }}</td>
+              <td>
+                <span [style.color]="licenciaUrgente(c.licenciaVence) ? 'var(--warn-600)' : 'inherit'">
+                  @if (licenciaUrgente(c.licenciaVence)) { <mat-icon class="alert-icon">warning</mat-icon> }
+                  {{ c.licenciaVence | date:'d/M/yy' : '' : 'es-BO' }}
+                </span>
+              </td>
+              <td>{{ c.telefono || '---' }}</td>
+              <td><app-status-badge [label]="getEstadoInfo(c.estado).label" [variant]="getEstadoInfo(c.estado).variant" /></td>
+              <td><button class="icon-btn" [class.active]="detalle()?.id === c.id" (click)="verDetalle(c.id); $event.stopPropagation()"><mat-icon>chevron_right</mat-icon></button></td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
-    <table class="tbl">
-      <thead><tr><th>Nombre</th><th>CI</th><th>Licencia</th><th>Categoria</th><th>Vencimiento</th><th>Telefono</th><th>Estado</th></tr></thead>
-      <tbody>
-        @for (c of choferes(); track c.id) {
-          <tr [class.warn]="licenciaUrgente(c.licenciaVence)">
-            <td><span class="fw600">{{ c.nombre }}</span></td>
-            <td><span class="mono">{{ c.ci }}</span></td>
-            <td><span class="badge-mini">{{ c.licenciaNumero }}</span></td>
-            <td>{{ c.licenciaCategoria }}</td>
-            <td>
-              <span [style.color]="licenciaUrgente(c.licenciaVence) ? 'var(--warn-600)' : 'inherit'">
-                @if (licenciaUrgente(c.licenciaVence)) { <mat-icon class="alert-icon">warning</mat-icon> }
-                {{ c.licenciaVence | date:'d/M/yy' : '' : 'es-BO' }}
-              </span>
-            </td>
-            <td>{{ c.telefono || '---' }}</td>
-            <td><app-status-badge [label]="getEstadoInfo(c.estado).label" [variant]="getEstadoInfo(c.estado).variant" /></td>
-          </tr>
+
+    @if (detalle() || loadingDetalle()) {
+      <div class="detail-panel card">
+        <div class="detail-header">
+          <h3>Detalle del chofer</h3>
+          <button class="icon-btn" (click)="cerrarDetalle()"><mat-icon>close</mat-icon></button>
+        </div>
+
+        @if (loadingDetalle()) {
+          <div class="detail-loading"><mat-icon class="spin">sync</mat-icon> Cargando...</div>
+        } @else if (detalle()) {
+          <div class="detail-body">
+            <div class="photos-row">
+              <div class="photo-slot">
+                <span class="photo-label">Foto de perfil</span>
+                @if (detalle()!.fotoPerfilUrl) {
+                  <img [src]="detalle()!.fotoPerfilUrl!" class="detail-photo" alt="Foto perfil" />
+                } @else {
+                  <div class="photo-empty"><mat-icon>person</mat-icon><span>Sin foto</span></div>
+                }
+              </div>
+              <div class="photo-slot">
+                <span class="photo-label">Foto facial</span>
+                @if (detalle()!.fotoFacialUrl) {
+                  <img [src]="detalle()!.fotoFacialUrl!" class="detail-photo" alt="Foto facial" />
+                } @else {
+                  <div class="photo-empty"><mat-icon>face</mat-icon><span>Sin foto</span></div>
+                }
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <div class="detail-row"><span class="dl">Nombre</span><span class="dv fw600">{{ detalle()!.nombre }}</span></div>
+              <div class="detail-row"><span class="dl">CI</span><span class="dv mono">{{ detalle()!.ci }}</span></div>
+              <div class="detail-row"><span class="dl">Teléfono</span><span class="dv">{{ detalle()!.telefono || '—' }}</span></div>
+              <div class="detail-row"><span class="dl">Estado</span>
+                <app-status-badge [label]="getEstadoInfo(detalle()!.estado).label" [variant]="getEstadoInfo(detalle()!.estado).variant" />
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <div class="section-title">Licencia</div>
+              <div class="detail-row"><span class="dl">Número</span><span class="dv mono">{{ detalle()!.licenciaNumero }}</span></div>
+              <div class="detail-row"><span class="dl">Categoría</span><span class="dv">{{ detalle()!.licenciaCategoria }}</span></div>
+              <div class="detail-row">
+                <span class="dl">Vencimiento</span>
+                <span class="dv" [style.color]="licenciaUrgente(detalle()!.licenciaVence) ? 'var(--warn-600)' : 'inherit'">
+                  {{ detalle()!.licenciaVence | date:'dd/MM/yyyy' : '' : 'es-BO' }}
+                  @if (licenciaUrgente(detalle()!.licenciaVence)) { <span class="warn-tag">Próximo a vencer</span> }
+                </span>
+              </div>
+            </div>
+
+            @if (detalle()!.usuario) {
+              <div class="detail-section">
+                <div class="section-title">Cuenta de acceso</div>
+                <div class="detail-row"><span class="dl">Email</span><span class="dv">{{ detalle()!.usuario!.email }}</span></div>
+              </div>
+            }
+          </div>
         }
-      </tbody>
-    </table>
+      </div>
+    }
   </div>
 </div>

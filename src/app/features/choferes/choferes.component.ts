@@ -5,9 +5,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { StatusBadgeComponent, BadgeVariant } from '../../shared/components/status-badge/status-badge.component';
-import { CHOFERES } from '../../graphql/flota.graphql';
+import { CHOFERES, CHOFER_POR_ID } from '../../graphql/flota.graphql';
 
 interface ChoferItem { id: string; nombre: string; ci: string; licenciaCategoria: string; licenciaNumero: string; licenciaVence: string; telefono?: string; estado: string; fotoPerfilUrl?: string }
+interface ChoferDetalle { id: string; nombre: string; ci: string; licenciaCategoria: string; licenciaNumero: string; licenciaVence: string; telefono?: string; estado: string; fotoPerfilUrl?: string; fotoFacialUrl?: string; usuario?: { id: string; email: string } | null }
 
 const ESTADO_CHOFER_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
   DISPONIBLE: { label: 'Disponible', variant: 'ok' },
@@ -26,7 +27,10 @@ const ESTADO_CHOFER_MAP: Record<string, { label: string; variant: BadgeVariant }
 export class ChoferesComponent {
   private apollo = inject(Apollo);
   private dialog = inject(MatDialog);
+
   readonly choferes = signal<ChoferItem[]>([]);
+  readonly detalle = signal<ChoferDetalle | null>(null);
+  readonly loadingDetalle = signal(false);
 
   readonly stats = computed(() => ({
     total: this.choferes().length,
@@ -56,6 +60,17 @@ export class ChoferesComponent {
     const diff = (d.getTime() - Date.now()) / (1000 * 60 * 60 * 24);
     return diff >= 0 && diff <= 30;
   }
+
+  verDetalle(id: string): void {
+    if (this.detalle()?.id === id) { this.detalle.set(null); return; }
+    this.loadingDetalle.set(true);
+    this.apollo.query<any>({ query: CHOFER_POR_ID, variables: { id }, fetchPolicy: 'network-only' }).subscribe({
+      next: (r) => { this.loadingDetalle.set(false); if (r.data?.chofer) this.detalle.set(r.data.chofer); },
+      error: () => this.loadingDetalle.set(false),
+    });
+  }
+
+  cerrarDetalle(): void { this.detalle.set(null); }
 
   abrirModal(): void {
     import('./chofer-modal.component').then((m) => {
