@@ -1,0 +1,155 @@
+<div class="page">
+  <h2 class="page-title">Reportes</h2>
+
+  <div class="tabs-bar">
+    <button class="tb" [class.active]="tab() === 'ventas'" (click)="tab.set('ventas')"><mat-icon>point_of_sale</mat-icon> Ventas</button>
+    <button class="tb" [class.active]="tab() === 'ocupacion'" (click)="tab.set('ocupacion')"><mat-icon>percent</mat-icon> Ocupacion</button>
+    <button class="tb" [class.active]="tab() === 'ingresos'" (click)="tab.set('ingresos')"><mat-icon>trending_up</mat-icon> Ingresos</button>
+    <button class="tb" [class.active]="tab() === 'ia'" (click)="tab.set('ia')"><mat-icon>psychology</mat-icon> IA</button>
+  </div>
+
+  <!-- TAB 1: VENTAS -->
+  @if (tab() === 'ventas') {
+    <div class="card filters-card">
+      <div class="filter-row">
+        <div class="f"><label class="fl">Desde</label><input class="inp" type="date" [(ngModel)]="fechaInicio" /></div>
+        <div class="f"><label class="fl">Hasta</label><input class="inp" type="date" [(ngModel)]="fechaFin" /></div>
+        <div class="f"><label class="fl">Ruta</label><select class="inp" [(ngModel)]="rutaId"><option value="">Todas</option><option *ngFor="let r of rutas()" [value]="r.id">{{r.origen.nombre}} → {{r.destino.nombre}}</option></select></div>
+        <button class="btn btn-primary btn-sm" (click)="consultar()" [disabled]="loading()"><mat-icon>search</mat-icon> Aplicar filtros</button>
+        <button class="btn btn-outline btn-sm" (click)="exportarCSV()"><mat-icon>download</mat-icon> Exportar CSV</button>
+      </div>
+    </div>
+
+    @if (resumen()) {
+      <div class="kpi-row">
+        <div class="card kpi"><span class="kl">Boletos vendidos</span><span class="mono kv">{{ resumen().totalBoletos }}</span></div>
+        <div class="card kpi"><span class="kl">Ingresos totales</span><span class="mono kv">{{ resumen().totalIngresos | currencyBob }}</span></div>
+        <div class="card kpi"><span class="kl">Ticket promedio</span><span class="mono kv">{{ kpiTicketPromedio() | currencyBob }}</span></div>
+        <div class="card kpi"><span class="kl">Viajes del dia</span><span class="mono kv">{{ resumen().viajesHoy }}</span></div>
+      </div>
+    }
+
+    <div class="card"><div class="card-top"><span class="muted">{{ boletos().length }} boletos</span></div>
+      @if (boletos().length > 0) {
+        <table class="tbl"><thead><tr><th>Fecha</th><th>Ruta</th><th>Hora</th><th>Pasajero</th><th>CI</th><th>Asiento</th><th>Precio</th></tr></thead>
+          <tbody>@for (b of boletos(); track b.id) { <tr><td>{{b.fechaVenta}}</td><td>{{b.viaje.horario.ruta.origen.nombre}} → {{b.viaje.horario.ruta.destino.nombre}}</td><td>{{b.viaje.horario.horaSalida}}</td><td>{{b.cliente.nombre}}</td><td>{{b.cliente.ci}}</td><td class="mono">{{b.asiento.numeroAsiento}}</td><td class="mono">Bs {{b.precioPagado}}</td></tr> }</tbody>
+        </table>
+        @if (boletosTotal() > 20) { <div class="pag"><button class="btn btn-ghost btn-sm" [disabled]="page()===1" (click)="page.set(page()-1); consultar()"><mat-icon>chevron_left</mat-icon></button><span>{{page()}} / {{Math.ceil(boletosTotal()/20)}}</span><button class="btn btn-ghost btn-sm" [disabled]="page()>=Math.ceil(boletosTotal()/20)" (click)="page.set(page()+1); consultar()"><mat-icon>chevron_right</mat-icon></button></div> }
+      } @else { <div class="empty"><mat-icon>inbox</mat-icon><span>No hay boletos en este periodo</span></div> }
+    </div>
+  }
+
+  <!-- TAB 2: OCUPACION -->
+  @if (tab() === 'ocupacion') {
+    <div class="card filters-card">
+      <div class="filter-row">
+        <div class="f"><label class="fl">Ruta</label><select class="inp" [(ngModel)]="rutaOcupacionId"><option value="">Seleccionar ruta</option><option *ngFor="let r of rutas()" [value]="r.id">{{r.origen.nombre}} → {{r.destino.nombre}}</option></select></div>
+        <div class="f"><label class="fl">Desde</label><input class="inp" type="date" [(ngModel)]="OCupacionFechaInicio" /></div>
+        <div class="f"><label class="fl">Hasta</label><input class="inp" type="date" [(ngModel)]="OCupacionFechaFin" /></div>
+        <button class="btn btn-primary btn-sm" (click)="consultarOcupacion()"><mat-icon>search</mat-icon> Aplicar</button>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="card chart-card">
+        <h3 class="ct">Ocupacion por dia</h3>
+        <div [appChart]="ocupacionChartOptions()" style="height:260px"></div>
+      </div>
+      <div class="card chart-card">
+        <h3 class="ct">Resumen de ocupacion</h3>
+        @if (ocupacionData().length > 0) {
+          <div class="occ-summary">
+            <div class="occ-stat"><span class="osl">Promedio</span><span class="mono osv">{{ ocupacionPromedioOcc() }}%</span></div>
+            <div class="occ-stat"><span class="osl">Maxima</span><span class="mono osv">{{ ocupacionMaximaOcc() }}%</span></div>
+            <div class="occ-stat"><span class="osl">Minima</span><span class="mono osv">{{ ocupacionMinimaOcc() }}%</span></div>
+          </div>
+        } @else {
+          <div class="empty-hint"><mat-icon>bar_chart</mat-icon><span class="muted">Selecciona ruta y aplica filtros</span></div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- TAB 3: INGRESOS -->
+  @if (tab() === 'ingresos') {
+    <div class="card filters-card">
+      <div class="filter-row">
+        <div class="presets">
+          <button class="pre" [class.active]="false" (click)="setPreset('hoy')">Hoy</button>
+          <button class="pre" [class.active]="false" (click)="setPreset('semana')">Esta semana</button>
+          <button class="pre" [class.active]="false" (click)="setPreset('mes')">Este mes</button>
+          <button class="pre" [class.active]="false" (click)="setPreset('mes-anterior')">Mes anterior</button>
+        </div>
+        <div class="f"><label class="fl">Desde</label><input class="inp" type="date" [(ngModel)]="fechaInicio" /></div>
+        <div class="f"><label class="fl">Hasta</label><input class="inp" type="date" [(ngModel)]="fechaFin" /></div>
+        <button class="btn btn-primary btn-sm" (click)="consultar()"><mat-icon>search</mat-icon> Aplicar</button>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="card chart-card">
+        <h3 class="ct">Ingresos por ruta</h3>
+        <div [appChart]="ingresosBarrasOptions()" style="height:350px"></div>
+      </div>
+      <div class="card chart-card">
+        <h3 class="ct">Comparativo mes actual vs anterior</h3>
+        <div [appChart]="comparativoOptions()" style="height:260px"></div>
+        <div class="comp-badge" [class.up]="comparacion().up" [class.down]="!comparacion().up">
+          <mat-icon>{{ comparacion().up ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+          {{ comparacion().up ? '+' : '' }}{{ comparacion().pct }}% vs mes anterior
+        </div>
+      </div>
+    </div>
+
+    <div class="card ingresos-summary">
+      <div class="is-row"><span class="isl">Ingreso total del periodo</span><span class="mono isv">{{ ingresosSummary().total | currencyBob }}</span></div>
+      <div class="is-row"><span class="isl">Ruta mas rentable</span><span class="isv">{{ ingresosSummary().rutaTop }}</span></div>
+    </div>
+  }
+
+  <!-- TAB 4: IA -->
+  @if (tab() === 'ia') {
+    <div class="card ia-card">
+      <div class="ia-header">
+        <mat-icon class="ia-icon">psychology</mat-icon>
+        <div>
+          <h3>Reportes Inteligentes</h3>
+          <p class="muted">Hace una pregunta sobre tus datos</p>
+        </div>
+      </div>
+      <div class="ia-input-row">
+        <input class="inp ia-inp" [(ngModel)]="iaQuery" placeholder="Cuantos boletos se vendieron esta semana?" (keyup.enter)="consultarIA()" />
+        <button class="btn btn-primary btn-sm" (click)="consultarIA()" [disabled]="iaLoading() || !iaQuery().trim()">
+          <mat-icon>search</mat-icon> Consultar
+        </button>
+      </div>
+      <div class="ia-examples">
+        <span class="muted">Ejemplos:</span>
+        <button class="chip" (click)="iaQuery.set('Cual es la ruta mas vendida?'); consultarIA()">Ruta mas vendida</button>
+        <button class="chip" (click)="iaQuery.set('Cuantos clientes nuevos este mes?'); consultarIA()">Clientes nuevos</button>
+        <button class="chip" (click)="iaQuery.set('Que chofer tiene mas viajes?'); consultarIA()">Chofer con mas viajes</button>
+      </div>
+
+      @if (iaLoading()) {
+        <div class="ia-spinner"><mat-icon class="spin">refresh</mat-icon> Procesando...</div>
+      }
+
+      @if (iaResult()?.error) {
+        <div class="ia-error"><mat-icon>error</mat-icon> {{ iaResult().error }}</div>
+      }
+
+      @if (iaResult() && !iaLoading()) {
+        @if (iaResult().explicacion) {
+          <div class="ia-explicacion">{{ iaResult().explicacion }}</div>
+        }
+        @if (iaResult().filas?.length > 0) {
+          <table class="tbl"><thead><tr>@for (c of iaResult().columnas; track c) {<th>{{c}}</th>}</tr></thead>
+            <tbody>@for (f of iaResult().filas; track $index) {<tr>@for (c of f; track $index) {<td>{{c}}</td>}</tr>}</tbody></table>
+          <button class="btn btn-outline btn-sm" (click)="exportarIACSV()"><mat-icon>download</mat-icon> Exportar CSV</button>
+        } @else if (!iaResult().error) {
+          <div class="empty"><mat-icon>inbox</mat-icon><span>No se encontraron resultados</span></div>
+        }
+      }
+    </div>
+  }
+</div>

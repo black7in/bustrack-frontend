@@ -1,0 +1,54 @@
+<div class="page">
+  <a class="back" routerLink="/app/viajes"><mat-icon>arrow_back</mat-icon> Volver a viajes</a>
+  @if (viaje()) {
+    <div class="header">
+      <div>
+        <h2>{{ viaje().horario.ruta.origen.nombre }} → {{ viaje().horario.ruta.destino.nombre }}</h2>
+        <p class="muted">{{ viaje().fecha }} · {{ viaje().horario.horaSalida }} · Carril {{ viaje().carrilAsignado || '---' }}</p>
+      </div>
+      <app-status-badge [label]="getEstadoInfo(viaje().estado).label" [variant]="getEstadoInfo(viaje().estado).variant" />
+    </div>
+
+    <div class="info-grid">
+      <div class="card info-card"><span class="il">Bus</span><span class="iv">{{ viaje().bus.placa }} ({{ viaje().bus.marca }} {{ viaje().bus.modelo }})</span></div>
+      <div class="card info-card"><span class="il">Chofer titular</span><span class="iv">{{ viaje().choferTitular.nombre }}</span></div>
+      <div class="card info-card"><span class="il">Chofer auxiliar</span><span class="iv">{{ viaje().choferAuxiliar?.nombre || '---' }}</span></div>
+      <div class="card info-card"><span class="il">Ocupacion</span><span class="iv mono">{{ viaje().totalVendidos }}/{{ viaje().bus.capacidad }}</span></div>
+    </div>
+
+    <div class="actions-bar">
+      @if (viaje().estado === 'PROGRAMADO') {
+        <button class="btn btn-primary btn-sm" (click)="iniciar()"><mat-icon>play_arrow</mat-icon> Iniciar viaje</button>
+        <button class="btn btn-ghost btn-sm" (click)="cancelar()"><mat-icon>cancel</mat-icon> Cancelar</button>
+      }
+      @if (viaje().estado === 'EN_RUTA') {
+        <button class="btn btn-primary btn-sm" (click)="finalizar()"><mat-icon>check</mat-icon> Finalizar viaje</button>
+      }
+    </div>
+
+    <div class="card">
+      <div class="card-top"><span class="muted">{{ boletos().length }} boletos vendidos</span></div>
+      @if (boletos().length > 0) {
+        <table class="tbl">
+          <thead><tr><th>Pasajero</th><th>CI</th><th>Asiento</th><th>Precio</th><th>Estado</th><th></th></tr></thead>
+          <tbody>
+            @for (b of boletos(); track b.id) {
+              <tr>
+                <td><span class="fw600">{{ b.cliente.nombre }}</span></td>
+                <td>{{ b.cliente.ci }}</td>
+                <td class="mono">{{ b.asiento.numeroAsiento }}</td>
+                <td class="mono">Bs {{ b.precioPagado }}</td>
+                <td><app-status-badge [label]="b.estado" [variant]="'ok'" /></td>
+                <td>
+                  @if (b.estado !== 'CANCELADO') {
+                    <button class="btn btn-ghost btn-icon btn-sm" (click)="cancelarBoleto(b.id)" title="Cancelar boleto"><mat-icon style="color:var(--err-600)">cancel</mat-icon></button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else { <div class="empty"><mat-icon>inbox</mat-icon><span>Sin boletos vendidos</span></div> }
+    </div>
+  }
+</div>

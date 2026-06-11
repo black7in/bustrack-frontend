@@ -1,0 +1,118 @@
+<div class="login-shell">
+  <div class="login-left">
+    <div class="login-left-inner">
+      <div class="login-logo">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <rect x="3.5" y="6" width="17" height="11" rx="2.2" stroke="var(--white)" strokeWidth="1.7"/>
+            <path d="M3.5 12h17" stroke="var(--white)" strokeWidth="1.7"/>
+            <circle cx="8" cy="17.5" r="1.2" fill="var(--color-accent)"/>
+            <circle cx="16" cy="17.5" r="1.2" fill="var(--color-accent)"/>
+            <path d="M7 9h2M15 9h2" stroke="var(--color-accent)" strokeWidth="1.7" strokeLinecap="round"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-name">BusTrack <span class="logo-accent">BO</span></span>
+          <span class="logo-sub">GESTION DE FLOTA</span>
+        </div>
+      </div>
+
+      <div class="login-form-wrapper">
+        <div class="login-form-inner">
+          <div class="login-eyebrow">BIENVENIDO DE VUELTA</div>
+          <h1 class="login-heading">
+            Inicia sesion en<br/>BusTrack <span class="login-heading-accent">BO</span>
+          </h1>
+          <p class="login-desc">
+            Plataforma de gestion para empresas de transporte interdepartamental de Bolivia.
+          </p>
+
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form" novalidate>
+            <mat-form-field appearance="outline" class="form-field-full">
+              <mat-label>Correo corporativo</mat-label>
+              <input matInput type="email" formControlName="email" placeholder="tu@empresa.bo" autocomplete="email" />
+              <mat-error *ngIf="emailControl?.hasError('required')">El correo es requerido</mat-error>
+              <mat-error *ngIf="emailControl?.hasError('email')">Ingresa un correo valido</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field-full">
+              <mat-label>Contrasena</mat-label>
+              <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" autocomplete="current-password" />
+              <button type="button" mat-icon-button matSuffix (click)="togglePassword()" tabindex="-1">
+                <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              <mat-error *ngIf="passwordControl?.hasError('required')">La contrasena es requerida</mat-error>
+              <mat-error *ngIf="passwordControl?.hasError('minlength')">Minimo 6 caracteres</mat-error>
+            </mat-form-field>
+
+            <div class="login-options">
+              <mat-checkbox formControlName="remember" class="remember-checkbox">
+                Mantener mi sesion iniciada
+              </mat-checkbox>
+              <a class="forgot-link">¿Olvidaste tu contrasena?</a>
+            </div>
+
+            <button type="submit" mat-flat-button class="login-submit" [disabled]="loading()">
+              @if (loading()) {
+                <mat-spinner diameter="20" class="spinner-white"></mat-spinner>
+              }
+              @if (!loading()) {
+                Iniciar sesion
+              }
+              @if (!loading()) {
+                <mat-icon>arrow_forward</mat-icon>
+              }
+            </button>
+          </form>
+
+          <div class="login-footer">
+            <span>&copy; 2026 BusTrack Bolivia S.R.L.</span>
+            <div class="login-footer-links">
+              <a>Terminos</a>
+              <a>Privacidad</a>
+              <a>Soporte</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="login-right">
+    <svg class="topo-lines" viewBox="0 0 600 800" preserveAspectRatio="none">
+      @for (p of topoPaths; track p.key) {
+        <path [attr.d]="p.d" fill="none" stroke="var(--white)" stroke-width="0.8" />
+      }
+    </svg>
+
+    <div class="login-glow"></div>
+
+    <div class="login-right-content">
+      <div class="testimonial-card">
+        <div class="testimonial-live">
+          <span class="live-dot"></span>
+          <span class="live-text">EN VIVO · La Paz Terminal</span>
+        </div>
+        <p class="testimonial-quote">
+          "Reducimos 38% el tiempo de cierre de caja al pasar de hojas Excel a BusTrack."
+        </p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">MT</div>
+          <div class="testimonial-info">
+            <span class="testimonial-name">Mariela Tarqui</span>
+            <span class="testimonial-role">Gerente · Trans Andino Sur</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="login-stats">
+        @for (s of stats; track s.label) {
+          <div class="login-stat">
+            <div class="login-stat-value">{{ s.value }}</div>
+            <div class="login-stat-label">{{ s.label }}</div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

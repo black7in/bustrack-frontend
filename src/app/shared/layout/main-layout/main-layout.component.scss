@@ -1,0 +1,23 @@
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-rows: var(--header-h) 1fr;
+  grid-template-areas:
+    'sidebar header'
+    'sidebar main';
+  height: 100vh;
+  background: var(--color-background);
+}
+
+app-sidebar {
+  grid-area: sidebar;
+}
+
+app-header {
+  grid-area: header;
+}
+
+.main-content {
+  grid-area: main;
+  overflow: auto;
+}

@@ -1,0 +1,10 @@
+<div class="overlay" (click)="close()"><div class="modal" (click)="$event.stopPropagation()">
+  <div class="mh"><h3>{{ isEdit() ? 'Editar' : 'Nueva' }} ruta</h3><button class="cbtn" (click)="close()"><mat-icon>close</mat-icon></button></div>
+  <form [formGroup]="form" (ngSubmit)="submit()" class="mb">
+    <div class="row2"><div class="f"><label class="fl">Origen</label><select class="inp" formControlName="terminalOrigenId"><option value="">Seleccionar</option><option *ngFor="let t of terminales()" [value]="t.id">{{t.nombre}} ({{t.ciudad}})</option></select></div>
+    <div class="f"><label class="fl">Destino</label><select class="inp" formControlName="terminalDestinoId"><option value="">Seleccionar</option><option *ngFor="let t of terminales()" [value]="t.id" [disabled]="t.id === form.value.terminalOrigenId">{{t.nombre}} ({{t.ciudad}})</option></select></div></div>
+    <div class="row2"><div class="f"><label class="fl">Distancia (km)</label><input class="inp" type="number" formControlName="distanciaKm" /></div>
+    <div class="f"><label class="fl">Duracion (min)</label><input class="inp" type="number" formControlName="duracionEstimadaMin" /></div></div>
+    <div class="mf"><button type="button" class="btn btn-ghost btn-sm" (click)="close()">Cancelar</button><button type="submit" class="btn btn-primary btn-sm" [disabled]="saving()">{{saving()?'Guardando...':'Guardar'}}</button></div>
+  </form>
+</div></div>

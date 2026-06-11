@@ -1,0 +1,37 @@
+<div class="modal-overlay" (click)="close()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Registrar nuevo bus</h3>
+      <button class="btn-close" (click)="close()"><mat-icon>close</mat-icon></button>
+    </div>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="modal-body">
+      <label class="photo-upload" for="fotoBus">
+        @if (fotoPreview()) {
+          <img [src]="fotoPreview()" class="photo-preview" alt="Preview" />
+        } @else {
+          <mat-icon>directions_bus</mat-icon>
+        }
+        <span>{{ fotoFile() ? fotoFile()?.name : 'Subir fotografia del bus' }}</span>
+      </label>
+      <input id="fotoBus" type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
+      <div class="row-2">
+        <div class="field"><label class="field-label">Placa</label><input class="input" formControlName="placa" placeholder="BTB-XXX" /></div>
+        <div class="field"><label class="field-label">Ano</label><input class="input" type="number" formControlName="anio" placeholder="2024" /></div>
+      </div>
+      <div class="row-2">
+        <div class="field"><label class="field-label">Marca</label><input class="input" formControlName="marca" placeholder="Mercedes-Benz" /></div>
+        <div class="field"><label class="field-label">Modelo</label><input class="input" formControlName="modelo" placeholder="O500RSD" /></div>
+      </div>
+      <div class="row-2">
+        <div class="field"><label class="field-label">Capacidad</label><input class="input" type="number" formControlName="capacidad" placeholder="44" /></div>
+        <div class="field"><label class="field-label">Carriles</label><input class="input" type="number" formControlName="numeroCarriles" placeholder="3" /></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost btn-sm" (click)="close()">Cancelar</button>
+        <button type="submit" class="btn btn-primary btn-sm" [disabled]="saving()">
+          {{ saving() ? 'Guardando...' : 'Guardar bus' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,150 @@
+.header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  gap: 16px;
+  height: 100%;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.menu-toggle {
+  display: none;
+}
+
+.header-info {
+  min-width: 0;
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.crumb {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.crumb-arrow {
+  font-size: 11px;
+  width: 11px;
+  height: 11px;
+  color: var(--ink-300);
+}
+
+.header-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink-900);
+  letter-spacing: -0.015em;
+}
+
+.header-subtitle {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-toggle {
+  color: var(--color-text-secondary);
+}
+
+.notif-btn {
+  color: var(--color-text-secondary);
+  position: relative;
+}
+
+.notif-dot {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-error);
+  border: 1.5px solid var(--color-surface);
+}
+
+.header-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--color-border);
+}
+
+.user-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 4px;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 12px;
+  display: grid;
+  place-items: center;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+}
+
+.user-info {
+  line-height: 1.15;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-900);
+}
+
+.user-role {
+  font-size: 11.5px;
+  color: var(--color-text-secondary);
+}
+
+.logout-btn {
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 900px) {
+  .header {
+    padding: 0 16px;
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  .user-info,
+  .header-subtitle {
+    display: none;
+  }
+}

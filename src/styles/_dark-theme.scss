@@ -1,0 +1,49 @@
+[data-theme="dark"] {
+  --color-background: #0B1120;
+  --color-surface: #131C2E;
+  --color-surface-variant: #1A2740;
+
+  --color-text-primary: #E8ECF2;
+  --color-text-secondary: #9098A8;
+  --color-text-disabled: #5A6270;
+
+  --color-border: #243044;
+  --color-divider: #1C2A3D;
+
+  --ink-050: #0B1120;
+  --ink-100: #131C2E;
+  --ink-150: #1A2740;
+  --ink-200: #243044;
+  --ink-300: #384558;
+  --ink-400: #5A6270;
+  --ink-500: #9098A8;
+  --ink-600: #B0B8C4;
+  --ink-700: #C8D0D8;
+  --ink-800: #E8ECF2;
+  --ink-900: #F4F6F8;
+
+  --white: var(--color-surface);
+
+  --ok-100: rgba(22, 163, 74, 0.18);
+  --ok-050: rgba(22, 163, 74, 0.10);
+  --ok-600: #22C55E;
+
+  --warn-100: rgba(245, 158, 11, 0.18);
+  --warn-050: rgba(245, 158, 11, 0.10);
+
+  --err-100: rgba(220, 38, 38, 0.18);
+  --err-050: rgba(220, 38, 38, 0.10);
+
+  --brand-100: rgba(30, 78, 120, 0.25);
+  --brand-050: rgba(30, 78, 120, 0.15);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px 1px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.30), 0 2px 4px rgba(0, 0, 0, 0.20);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.35), 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-xl: 0 24px 56px rgba(0, 0, 0, 0.40);
+
+  --sidebar-bg: #060F1A;
+  --sidebar-text: rgba(255, 255, 255, 0.80);
+  --sidebar-active-bg: rgba(232, 146, 32, 0.16);
+  --sidebar-active-text: #FFFFFF;
+}

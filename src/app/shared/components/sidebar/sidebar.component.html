@@ -1,0 +1,86 @@
+<aside class="sidebar" [class.collapsed]="collapsed()">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <rect x="3.5" y="6" width="17" height="11" rx="2.2" stroke="var(--white)" strokeWidth="1.7"/>
+        <path d="M3.5 12h17" stroke="var(--white)" strokeWidth="1.7"/>
+        <circle cx="8" cy="17.5" r="1.2" fill="var(--color-accent)"/>
+        <circle cx="16" cy="17.5" r="1.2" fill="var(--color-accent)"/>
+        <path d="M7 9h2M15 9h2" stroke="var(--color-accent)" strokeWidth="1.7" strokeLinecap="round"/>
+      </svg>
+    </div>
+    @if (!collapsed()) {
+      <div class="logo-text">
+        <span class="logo-name">BusTrack <span class="logo-accent">BO</span></span>
+        <span class="logo-sub">GESTION DE FLOTA</span>
+      </div>
+    }
+  </div>
+
+  <div class="sidebar-search">
+    <div class="search-box">
+      <mat-icon class="search-icon">search</mat-icon>
+      @if (!collapsed()) {
+        <span class="search-placeholder">Buscar...</span>
+        <span class="search-shortcut">Ctrl+K</span>
+      }
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    @if (operacionItems.length > 0) {
+      <div class="nav-section-label">OPERACION</div>
+      @for (item of operacionItems; track item.id) {
+        <button
+          class="nav-item"
+          [class.active]="isActive(item.id)"
+          (click)="onNavigate(item.id)"
+          matRipple
+        >
+          @if (isActive(item.id)) {
+            <span class="active-indicator"></span>
+          }
+          <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+          @if (!collapsed()) {
+            <span class="nav-label">{{ item.label }}</span>
+          }
+          @if (!collapsed() && item.badge) {
+            <span class="nav-badge">{{ item.badge }}</span>
+          }
+        </button>
+      }
+    }
+
+    @if (catalogoItems.length > 0) {
+      <div class="nav-section-label">CATALOGO</div>
+      @for (item of catalogoItems; track item.id) {
+        <button
+          class="nav-item"
+          [class.active]="isActive(item.id)"
+          (click)="onNavigate(item.id)"
+          matRipple
+        >
+          @if (isActive(item.id)) {
+            <span class="active-indicator"></span>
+          }
+          <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+          @if (!collapsed()) {
+            <span class="nav-label">{{ item.label }}</span>
+          }
+        </button>
+      }
+    }
+  </nav>
+
+  @if (!collapsed()) {
+    <div class="sidebar-footer">
+      <div class="plan-card">
+        <div class="plan-header">
+          <mat-icon class="plan-star">stars</mat-icon>
+          <span class="plan-title">Plan Empresa</span>
+        </div>
+        <p class="plan-detail">12 buses · 28 choferes activos · soporte 24/7</p>
+      </div>
+    </div>
+  }
+</aside>

@@ -1,0 +1,23 @@
+<div class="app-shell">
+  <app-sidebar
+    [activeRoute]="currentRoute()"
+    [userRole]="usuario().rol"
+    (navigate)="onNavigate($event)"
+  />
+
+  <app-header
+    [title]="headerInfo().title"
+    [subtitle]="headerInfo().subtitle"
+    [breadcrumbs]="headerInfo().breadcrumbs"
+    [userName]="usuario().nombre"
+    [userRole]="userRoleLabel()"
+    [userInitials]="userInitials()"
+    [isDark]="isDark() === 'dark'"
+    (toggleTheme)="onToggleTheme()"
+    (logout)="onLogout()"
+  />
+
+  <main class="main-content">
+    <router-outlet />
+  </main>
+</div>

@@ -1,0 +1,228 @@
+<div class="dashboard">
+  <div class="top-bar">
+    <div>
+      <div class="eyebrow">{{ fechaInicio() | date:'EEEE · d \'de\' MMMM, y' : '' : 'es-BO' | titlecase }}</div>
+      <h2 class="welcome-title">Panel de operaciones</h2>
+      <p class="muted welcome-sub">Resumen de operaciones · Terminal La Paz</p>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-outline btn-sm" [matMenuTriggerFor]="periodMenu">
+        <mat-icon>calendar_today</mat-icon> {{ periodoLabel() }}
+        <mat-icon>expand_more</mat-icon>
+      </button>
+      <mat-menu #periodMenu="matMenu">
+        <button mat-menu-item (click)="setPeriodo('hoy')">
+          <mat-icon>today</mat-icon> Hoy
+        </button>
+        <button mat-menu-item (click)="setPeriodo('semana')">
+          <mat-icon>date_range</mat-icon> Esta semana
+        </button>
+        <button mat-menu-item (click)="setPeriodo('mes')">
+          <mat-icon>calendar_month</mat-icon> Este mes
+        </button>
+      </mat-menu>
+      <button class="btn btn-outline btn-sm">
+        <mat-icon>download</mat-icon> Exportar
+      </button>
+      <button class="btn btn-accent btn-sm" routerLink="/app/ventas">
+        <mat-icon>add</mat-icon> Vender boleto
+      </button>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <app-stat-card
+      label="Boletos vendidos"
+      [value]="boletosHoy()"
+      icon="confirmation_number"
+      [trend]="0"
+      [trendLabel]="periodoLabel()"
+    />
+    <app-stat-card
+      label="Ingresos"
+      [value]="ingresosHoy() | currencyBob"
+      icon="attach_money"
+      [trend]="0"
+      [trendLabel]="periodoLabel()"
+    />
+    <app-stat-card
+      label="Viajes del dia"
+      [value]="viajesProgramados()"
+      icon="alt_route"
+      [trend]="0"
+      trendLabel="hoy"
+    />
+    <app-stat-card
+      label="Ocupacion promedio"
+      [value]="ocupacionPromedio() + '%'"
+      icon="groups"
+      [trend]="0"
+      [trendLabel]="periodoLabel()"
+    />
+  </div>
+
+  <!-- Prediccion y Segmentacion -->
+  <div class="ai-row">
+    @if (prediccion()) {
+      <div class="card pred-card">
+        <div class="pred-header">
+          <mat-icon class="pred-icon">psychology</mat-icon>
+          <div>
+            <h3>Prediccion de demanda</h3>
+            <p class="muted">{{ prediccion().rutaId }} · {{ prediccion().fecha | date:'d/M' }}</p>
+          </div>
+        </div>
+        <div class="pred-grid">
+          <div class="pred-stat">
+            <span class="ps-label">Ocupacion predicha</span>
+            <span class="ps-value mono">{{ (prediccion().ocupacionPredicha * 100).toFixed(0) }}%</span>
+          </div>
+          <div class="pred-stat">
+            <span class="ps-label">Precio sugerido</span>
+            <span class="ps-value mono">Bs {{ prediccion().precioSugerido?.toFixed(0) }}</span>
+          </div>
+          <div class="pred-stat">
+            <span class="ps-label">Ajuste</span>
+            <span class="ps-value" [style.color]="prediccion().ajustePorcentaje >= 0 ? 'var(--ok-600)' : 'var(--err-600)'">{{ prediccion().ajustePorcentaje >= 0 ? '+' : '' }}{{ prediccion().ajustePorcentaje?.toFixed(1) }}%</span>
+          </div>
+          <div class="pred-stat">
+            <span class="ps-label">Confianza</span>
+            <span class="ps-value mono">{{ (prediccion().confianza * 100).toFixed(0) }}%</span>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (segmentacion()) {
+      <div class="card seg-card">
+        <h3>Segmentacion de clientes</h3>
+        <p class="muted">{{ segmentacion().totalClientes }} clientes · {{ segmentacion().segmentos?.length || 0 }} segmentos</p>
+        <div class="seg-list">
+          @for (s of segmentacion().segmentos; track s.id) {
+            <div class="seg-item">
+              <div class="seg-bar">
+                <div class="seg-fill" [style.width.%]="s.porcentaje" [style.background]="'var(--brand-600)'"></div>
+              </div>
+              <div class="seg-info">
+                <span class="seg-name">{{ s.nombre }}</span>
+                <span class="seg-pct mono">{{ s.totalClientes }} ({{ s.porcentaje }}%)</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="card chart-card">
+      <div class="card-header">
+        <h3 class="card-title">Ocupacion por ruta</h3>
+        <p class="muted card-subtitle">Top 5 · {{ fechaInicio() | date:'d/M/yy' : '' : 'es-BO' }}</p>
+      </div>
+
+      @if (ocupacionPorRuta().length > 0) {
+        <div class="occupancy-list">
+          @for (row of ocupacionPorRuta(); track row.ruta) {
+            <div class="occ-row">
+              <div class="occ-row-header">
+                <span class="occ-route">{{ row.ruta }}</span>
+                <span class="mono occ-pct">{{ row.ocupacion }}%</span>
+              </div>
+              <div class="occ-bar-bg">
+                <div
+                  class="occ-bar-fill"
+                  [style.width.%]="row.ocupacion"
+                  [style.background]="row.ocupacion >= 90 ? 'var(--err-600)' : row.ocupacion >= 70 ? 'var(--warn-500)' : 'var(--ok-600)'"
+                ></div>
+              </div>
+              <div class="muted occ-count">{{ row.viajes }} viajes</div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-hint">
+          <mat-icon class="empty-icon">bar_chart</mat-icon>
+          <span class="muted">Sin viajes para calcular ocupacion</span>
+        </div>
+      }
+    </div>
+
+    <div class="card trips-card">
+      <div class="card-header trips-header">
+        <div>
+          <h3 class="card-title">Viajes del dia</h3>
+          <p class="muted card-subtitle">
+            @if (loading()) { Cargando... }
+            @else { {{ viajes().length }} programados · {{ viajesEnOperacion() }} en operacion }
+          </p>
+        </div>
+        <button class="btn btn-ghost btn-sm" routerLink="/app/viajes">
+          Ver todos <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+
+      @if (viajes().length > 0) {
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Codigo</th>
+              <th>Ruta</th>
+              <th>Salida</th>
+              <th>Bus / Chofer</th>
+              <th>Ocupacion</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of viajes(); track t.id) {
+              <tr>
+                <td><span class="mono trip-code">#{{ t.id }}</span></td>
+                <td>
+                  <div class="trip-route">
+                    <span>{{ t.horario.ruta.origen.nombre }}</span>
+                    <mat-icon class="route-arrow">arrow_forward</mat-icon>
+                    <span>{{ t.horario.ruta.destino.nombre }}</span>
+                  </div>
+                </td>
+                <td><span class="mono trip-time">{{ t.horario.horaSalida }}</span></td>
+                <td>
+                  <div class="trip-bus-info">
+                    <span class="trip-bus">{{ t.bus.placa }}</span>
+                    <span class="muted trip-driver">{{ t.choferTitular.nombre }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="occ-bar-cell">
+                    <div class="occ-bar-row">
+                      <span class="mono occ-nums">{{ t.totalVendidos }}/{{ t.asientos }}</span>
+                      <span class="muted occ-pct-small">{{ (t.totalVendidos / t.asientos * 100) | number:'1.0-0' }}%</span>
+                    </div>
+                    <div class="occ-bar-bg">
+                      <div
+                        class="occ-bar-fill"
+                        [style.width.%]="(t.totalVendidos / t.asientos * 100)"
+                        [class]="getOcupacionClass(t.totalVendidos, t.asientos)"
+                      ></div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <app-status-badge
+                    [label]="getEstadoInfo(t.estado).label"
+                    [variant]="getEstadoInfo(t.estado).variant"
+                  />
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else if (!loading()) {
+        <div class="empty-state">
+          <mat-icon class="empty-icon">inbox</mat-icon>
+          <span>No hay viajes programados para hoy</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>

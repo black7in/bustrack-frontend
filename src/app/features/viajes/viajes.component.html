@@ -1,0 +1,54 @@
+<div class="page">
+  <div class="top-bar">
+    <h2 class="page-title">Viajes</h2>
+    <div class="top-actions">
+      @if (showGenerarBtn()) {
+        <input class="inp" type="date" [ngModel]="generarFecha()" (ngModelChange)="generarFecha.set($event)" style="width:150px" />
+        <button class="btn btn-primary btn-sm" (click)="generarViajesHoy()"><mat-icon>auto_awesome</mat-icon> Generar viajes</button>
+      }
+      <button class="btn btn-accent btn-sm" (click)="abrirModal()"><mat-icon>add</mat-icon> Programar viaje</button>
+    </div>
+  </div>
+  <div class="filters">
+    <input class="inp" type="date" [ngModel]="filterFecha()" (ngModelChange)="filterFecha.set($event); loadViajes()" />
+    <select class="inp" [ngModel]="filterRutaId()" (ngModelChange)="filterRutaId.set($event); loadViajes()">
+      <option value="">Todas las rutas</option>
+      @for (r of rutas(); track r.id) { <option [value]="r.id">{{r.origen.nombre}} → {{r.destino.nombre}}</option> }
+    </select>
+    <select class="inp" [ngModel]="filterEstado()" (ngModelChange)="filterEstado.set($event); loadViajes()">
+      <option value="">Todos los estados</option>
+      <option value="PROGRAMADO">Programado</option>
+      <option value="EN_RUTA">En ruta</option>
+      <option value="COMPLETADO">Completado</option>
+      <option value="CANCELADO">Cancelado</option>
+    </select>
+  </div>
+  <div class="card table-card">
+    <div class="card-top"><span class="muted">{{ total() }} viajes</span></div>
+    <table class="tbl">
+      <thead><tr><th>Fecha</th><th>Ruta</th><th>Hora</th><th>Bus</th><th>Chofer</th><th>Ocupacion</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody>
+        @for (v of viajes(); track v.id) {
+          <tr>
+            <td>{{ v.fecha }}</td>
+            <td><a class="link" [routerLink]="['/app/viajes', v.id]">{{ v.horario.ruta.origen.nombre }} → {{ v.horario.ruta.destino.nombre }}</a></td>
+            <td><span class="mono">{{ v.horario.horaSalida }}</span></td>
+<td>{{ v.bus?.placa || '---' }}</td>
+<td>{{ v.choferTitular?.nombre || '---' }}</td>
+            <td><span class="mono">{{ v.totalVendidos }}/{{ v.bus?.capacidad || v.totalLibres + v.totalVendidos }}</span></td>
+            <td><app-status-badge [label]="getEstadoInfo(v.estado).label" [variant]="getEstadoInfo(v.estado).variant" /></td>
+            <td>
+              <div class="actions">
+                <a class="btn btn-ghost btn-icon" [routerLink]="['/app/viajes', v.id]" title="Detalle"><mat-icon>visibility</mat-icon></a>
+                <button class="btn btn-ghost btn-icon" (click)="editar(v)" title="Editar"><mat-icon>edit</mat-icon></button>
+                @if (v.estado === 'PROGRAMADO') {
+                  <button class="btn btn-ghost btn-icon" (click)="cancelar(v.id)" title="Cancelar"><mat-icon style="color:var(--err-600)">cancel</mat-icon></button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,25 @@
+<div class="page">
+  <h2 class="page-title">Horarios</h2>
+  <div class="top-bar">
+    <div class="filters">
+      <button class="filter-btn" [class.active]="filterActivo()" (click)="setFilter(true)">Activos</button>
+      <button class="filter-btn" [class.active]="!filterActivo()" (click)="setFilter(false)">Todos</button>
+    </div>
+    <button class="btn btn-accent btn-sm" (click)="abrirModal()"><mat-icon>add</mat-icon> Nuevo horario</button>
+  </div>
+  <div class="card table-card">
+    <table class="tbl">
+      <thead><tr><th>Ruta</th><th>Hora Salida</th><th>Dias</th><th>Estado</th></tr></thead>
+      <tbody>
+        @for (h of horarios(); track h.id) {
+          <tr>
+            <td><span class="fw600">{{ h.ruta.origen.nombre }} → {{ h.ruta.destino.nombre }}</span></td>
+            <td><span class="mono">{{ h.horaSalida }}</span></td>
+            <td>{{ diasLabel(h.diasSemana) }}</td>
+            <td><span class="badge" [class.badge-ok]="h.activo" [class.badge-err]="!h.activo">{{ h.activo ? 'Activo' : 'Inactivo' }}</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

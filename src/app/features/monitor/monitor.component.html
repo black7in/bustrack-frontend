@@ -1,0 +1,29 @@
+<div class="page">
+  <div class="top-bar">
+    <h2 class="page-title">Monitor de buses</h2>
+    <span class="muted">Actualiza cada 30s · {{ viajes().length }} activos</span>
+  </div>
+
+  @if (viajes().length > 0) {
+    <div class="card table-card">
+      <table class="tbl">
+        <thead><tr><th>Bus</th><th>Ruta</th><th>Chofer</th><th>Salida</th><th>Velocidad</th><th>Abordados</th><th></th></tr></thead>
+        <tbody>
+          @for (v of viajes(); track v.viajeId) {
+            <tr>
+              <td><span class="mono fw600">{{ v.busPlaca }}</span></td>
+              <td>{{ v.ruta }}</td>
+              <td>{{ v.choferNombre }}</td>
+              <td>{{ v.horaSalida || '---' }}</td>
+              <td><span class="mono velocity">{{ getVelocidad(v) }}</span></td>
+              <td><span class="mono">{{ v.abordados }}/{{ v.vendidos || '---' }}</span></td>
+              <td><a class="btn btn-ghost btn-sm" [routerLink]="['/app/monitor', v.viajeId]"><mat-icon>visibility</mat-icon> Ver detalle</a></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else if (!loading()) {
+    <div class="empty"><mat-icon>directions_bus</mat-icon><span>No hay viajes activos</span></div>
+  }
+</div>

@@ -1,0 +1,35 @@
+<div class="page">
+  <div class="top-bar">
+    <h2 class="page-title">Rutas</h2>
+    <button class="btn btn-accent btn-sm" (click)="abrirModal()"><mat-icon>add</mat-icon> Nueva ruta</button>
+  </div>
+  <div class="card table-card">
+    <table class="tbl">
+      <thead><tr><th>Ruta</th><th>Distancia</th><th>Duracion</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody>
+        @for (r of rutas(); track r.id) {
+          <tr>
+            <td>
+              <a class="ruta-link" [routerLink]="['/app/rutas', r.id]">
+                <span class="fw600">{{ r.origen.nombre }}</span>
+                <mat-icon class="arrow">arrow_forward</mat-icon>
+                <span class="fw600">{{ r.destino.nombre }}</span>
+              </a>
+            </td>
+            <td>{{ r.distanciaKm ? r.distanciaKm + ' km' : '---' }}</td>
+            <td>{{ r.duracionEstimadaMin ? r.duracionEstimadaMin + ' min' : '---' }}</td>
+            <td><span class="badge" [class.badge-ok]="r.activa" [class.badge-err]="!r.activa">{{ r.activa ? 'Activa' : 'Inactiva' }}</span></td>
+            <td>
+              <div class="actions">
+                <button class="btn btn-ghost btn-icon" (click)="editar(r)" title="Editar"><mat-icon>edit</mat-icon></button>
+                <button class="btn btn-ghost btn-icon" (click)="toggleActiva(r)" title="Activar/Desactivar">
+                  <mat-icon [style.color]="r.activa ? 'var(--err-600)' : 'var(--ok-600)'">{{ r.activa ? 'power_settings_new' : 'play_arrow' }}</mat-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

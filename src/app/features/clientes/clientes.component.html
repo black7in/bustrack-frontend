@@ -1,0 +1,55 @@
+<div class="clientes">
+  <div class="card search-card">
+    <div class="search-title">
+      <mat-icon class="search-title-icon">people</mat-icon>
+      <h3>Buscar clientes</h3>
+    </div>
+    <div class="search-row">
+      <div class="input-wrap">
+        <mat-icon class="input-icon">search</mat-icon>
+        <input class="input input-pl" placeholder="Buscar por CI o nombre..." (input)="onSearch($any($event.target).value)" />
+      </div>
+    </div>
+  </div>
+  <div class="clientes-grid">
+    <div class="card table-card">
+      <div class="table-header"><span class="muted">{{ clientes().length }} resultados</span></div>
+      @if (clientes().length > 0) {
+        <table class="tbl"><thead><tr><th>CI</th><th>Nombre</th><th>Telefono</th><th>Email</th><th></th></tr></thead>
+          <tbody>
+            @for (c of clientes(); track c.id) {
+              <tr [class.selected]="clienteSeleccionado()?.id === c.id">
+                <td><span class="mono">{{ c.ci }}</span></td>
+                <td><span class="fw600">{{ c.nombre }}</span></td>
+                <td>{{ c.telefono || '---' }}</td>
+                <td>{{ c.email || '---' }}</td>
+                <td><button class="btn btn-ghost btn-sm" (click)="verBoletos(c)"><mat-icon>receipt_long</mat-icon> Ver boletos</button></td>
+              </tr>
+            }
+          </tbody></table>
+      } @else { <div class="empty-state"><mat-icon class="empty-icon">person_off</mat-icon><span>No se encontraron clientes</span></div> }
+    </div>
+    @if (clienteSeleccionado()) {
+      <div class="card detail-card">
+        <div class="detail-header"><div><h3>{{ clienteSeleccionado()?.nombre }}</h3><p class="muted">CI: {{ clienteSeleccionado()?.ci }}</p></div>
+          <button class="btn btn-ghost btn-sm" (click)="cerrarDetalle()"><mat-icon>close</mat-icon></button></div>
+        <div class="detail-contact">
+          <div class="contact-row"><mat-icon>call</mat-icon><span>{{ clienteSeleccionado()?.telefono || 'Sin telefono' }}</span></div>
+          <div class="contact-row"><mat-icon>mail</mat-icon><span>{{ clienteSeleccionado()?.email || 'Sin email' }}</span></div>
+        </div>
+        <h4 class="section-title">Historial de boletos</h4>
+        @if (boletos().length > 0) {
+          <div class="boleto-list">
+            @for (b of boletos(); track b.id) {
+              <div class="boleto-item">
+                <div class="boleto-main"><span class="boleto-ruta">{{ b.viaje.horario.ruta.origen.nombre }} to {{ b.viaje.horario.ruta.destino.nombre }}</span>
+                  <span class="muted boleto-fecha">{{ b.fechaVenta | date:'d/M/yy' : '' : 'es-BO' }} - {{ b.viaje.horario.horaSalida }}</span></div>
+                <div class="boleto-meta"><span class="mono">Asiento {{ b.asiento.numeroAsiento }}</span><span class="mono boleto-precio">Bs {{ b.precioPagado }}</span></div>
+              </div>
+            }
+          </div>
+        } @else { <p class="muted">Sin boletos registrados</p> }
+      </div>
+    }
+  </div>
+</div>

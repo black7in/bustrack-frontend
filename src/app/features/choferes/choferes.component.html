@@ -1,0 +1,48 @@
+<div class="choferes">
+  <div class="stats-row">
+    <div class="card stat-card">
+      <span class="stat-label">Choferes activos</span>
+      <span class="stat-value mono" style="color:var(--brand-700)">{{ stats().total }} <small>choferes</small></span>
+    </div>
+    <div class="card stat-card">
+      <span class="stat-label">Disponibles</span>
+      <span class="stat-value mono" style="color:var(--ok-600)">{{ stats().disponible }} <small>choferes</small></span>
+    </div>
+    <div class="card stat-card">
+      <span class="stat-label">En viaje</span>
+      <span class="stat-value mono" style="color:var(--accent-600)">{{ stats().enViaje }} <small>choferes</small></span>
+    </div>
+    <div class="card stat-card">
+      <span class="stat-label">Licencias por vencer</span>
+      <span class="stat-value mono" style="color:var(--warn-600)">{{ stats().licenciaProxima }} <small>choferes</small></span>
+    </div>
+  </div>
+
+  <div class="card table-card">
+    <div class="table-header">
+      <span class="muted">{{ choferes().length }} choferes</span>
+      <button class="btn btn-accent btn-sm" (click)="abrirModal()"><mat-icon>add</mat-icon> Registrar chofer</button>
+    </div>
+    <table class="tbl">
+      <thead><tr><th>Nombre</th><th>CI</th><th>Licencia</th><th>Categoria</th><th>Vencimiento</th><th>Telefono</th><th>Estado</th></tr></thead>
+      <tbody>
+        @for (c of choferes(); track c.id) {
+          <tr [class.warn]="licenciaUrgente(c.licenciaVence)">
+            <td><span class="fw600">{{ c.nombre }}</span></td>
+            <td><span class="mono">{{ c.ci }}</span></td>
+            <td><span class="badge-mini">{{ c.licenciaNumero }}</span></td>
+            <td>{{ c.licenciaCategoria }}</td>
+            <td>
+              <span [style.color]="licenciaUrgente(c.licenciaVence) ? 'var(--warn-600)' : 'inherit'">
+                @if (licenciaUrgente(c.licenciaVence)) { <mat-icon class="alert-icon">warning</mat-icon> }
+                {{ c.licenciaVence | date:'d/M/yy' : '' : 'es-BO' }}
+              </span>
+            </td>
+            <td>{{ c.telefono || '---' }}</td>
+            <td><app-status-badge [label]="getEstadoInfo(c.estado).label" [variant]="getEstadoInfo(c.estado).variant" /></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

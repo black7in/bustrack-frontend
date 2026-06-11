@@ -1,0 +1,29 @@
+<div class="page">
+  <div class="top-bar">
+    <h2 class="page-title">Terminales</h2>
+    <button class="btn btn-accent btn-sm" (click)="newTerminal()"><mat-icon>add</mat-icon> Nueva terminal</button>
+  </div>
+
+  @if (showForm()) {
+    <div class="card form-card">
+      <form [formGroup]="form" (ngSubmit)="save()" class="form-row">
+        <div class="f"><label class="fl">Nombre</label><input class="inp" formControlName="nombre" placeholder="Terminal La Paz" /></div>
+        <div class="f"><label class="fl">Ciudad</label><input class="inp" formControlName="ciudad" placeholder="La Paz" /></div>
+        <button type="submit" class="btn btn-primary btn-sm">{{ editing() ? 'Actualizar' : 'Guardar' }}</button>
+        <button type="button" class="btn btn-ghost btn-sm" (click)="cancel()">Cancelar</button>
+      </form>
+    </div>
+  }
+
+  <div class="card table-card">
+    <table class="tbl">
+      <thead><tr><th>Nombre</th><th>Ciudad</th><th></th></tr></thead>
+      <tbody>
+        @for (t of terminales(); track t.id) {
+          <tr><td><span class="fw600">{{ t.nombre }}</span></td><td>{{ t.ciudad || '---' }}</td>
+          <td><button class="btn btn-ghost btn-icon btn-sm" (click)="editTerminal(t)"><mat-icon>edit</mat-icon></button></td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

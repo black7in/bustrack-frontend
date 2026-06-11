@@ -1,0 +1,120 @@
+@use '@angular/material' as mat;
+
+$_primary-palette: (
+  50: #F2F7FB,
+  100: #E5EEF6,
+  200: #B8CDE2,
+  300: #8AACCE,
+  400: #4376A5,
+  500: #2C6FA3,
+  600: #1E4E78,
+  700: #143A5C,
+  800: #0B2942,
+  900: #071A2B,
+  contrast: (
+    50: #1A2230,
+    100: #1A2230,
+    200: #1A2230,
+    300: #1A2230,
+    400: #FFFFFF,
+    500: #FFFFFF,
+    600: #FFFFFF,
+    700: #FFFFFF,
+    800: #FFFFFF,
+    900: #FFFFFF,
+  ),
+);
+
+$_accent-palette: (
+  50: #FFF8F0,
+  100: #FDECD2,
+  200: #FAD19A,
+  300: #F4A53A,
+  400: #F4A53A,
+  500: #E89220,
+  600: #D17C13,
+  700: #B26A0B,
+  800: #8A5A08,
+  900: #634005,
+  contrast: (
+    50: #1A2230,
+    100: #1A2230,
+    200: #1A2230,
+    300: #1A2230,
+    400: #1A2230,
+    500: #1A2230,
+    600: #FFFFFF,
+    700: #FFFFFF,
+    800: #FFFFFF,
+    900: #FFFFFF,
+  ),
+);
+
+$_warn-palette: (
+  50: #FEF2F2,
+  100: #FEE2E2,
+  200: #FECACA,
+  300: #FCA5A5,
+  400: #F87171,
+  500: #EF4444,
+  600: #DC2626,
+  700: #B91C1C,
+  800: #991B1B,
+  900: #7F1D1D,
+  contrast: (
+    50: #1A2230,
+    100: #1A2230,
+    200: #1A2230,
+    300: #1A2230,
+    400: #1A2230,
+    500: #FFFFFF,
+    600: #FFFFFF,
+    700: #FFFFFF,
+    800: #FFFFFF,
+    900: #FFFFFF,
+  ),
+);
+
+$bustrack-primary: mat.m2-define-palette($_primary-palette, 800, 600, 900);
+$bustrack-accent: mat.m2-define-palette($_accent-palette, 500, 400, 700);
+$bustrack-warn: mat.m2-define-palette($_warn-palette, 600, 500, 700);
+
+$bustrack-light-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $bustrack-primary,
+    accent: $bustrack-accent,
+    warn: $bustrack-warn,
+  ),
+  typography: mat.m2-define-typography-config(
+    $font-family: 'var(--font-sans)',
+    $headline-1: mat.m2-define-typography-level(32px, 40px, 800, 'var(--font-sans)', -0.025em),
+    $headline-2: mat.m2-define-typography-level(24px, 32px, 700, 'var(--font-sans)', -0.02em),
+    $headline-3: mat.m2-define-typography-level(18px, 26px, 700, 'var(--font-sans)', -0.015em),
+    $headline-4: mat.m2-define-typography-level(15px, 22px, 700, 'var(--font-sans)', -0.01em),
+    $body-1: mat.m2-define-typography-level(14px, 21px, 400),
+    $body-2: mat.m2-define-typography-level(13.5px, 20px, 500),
+    $button: mat.m2-define-typography-level(13.5px, 14px, 600, 'var(--font-sans)', -0.005em),
+    $caption: mat.m2-define-typography-level(11.5px, 16px, 500),
+  ),
+  density: 0,
+));
+
+$bustrack-dark-theme: mat.m2-define-dark-theme((
+  color: (
+    primary: $bustrack-primary,
+    accent: $bustrack-accent,
+    warn: $bustrack-warn,
+  ),
+  typography: mat.m2-define-typography-config(
+    $font-family: 'var(--font-sans)',
+    $headline-1: mat.m2-define-typography-level(32px, 40px, 800, 'var(--font-sans)', -0.025em),
+    $headline-2: mat.m2-define-typography-level(24px, 32px, 700, 'var(--font-sans)', -0.02em),
+    $headline-3: mat.m2-define-typography-level(18px, 26px, 700, 'var(--font-sans)', -0.015em),
+    $headline-4: mat.m2-define-typography-level(15px, 22px, 700, 'var(--font-sans)', -0.01em),
+    $body-1: mat.m2-define-typography-level(14px, 21px, 400),
+    $body-2: mat.m2-define-typography-level(13.5px, 20px, 500),
+    $button: mat.m2-define-typography-level(13.5px, 14px, 600, 'var(--font-sans)', -0.005em),
+    $caption: mat.m2-define-typography-level(11.5px, 16px, 500),
+  ),
+  density: 0,
+));

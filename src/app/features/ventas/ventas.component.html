@@ -1,0 +1,298 @@
+<div class="ventas">
+  @if (boletoEmitido()) {
+    <div class="modal-overlay" (click)="nuevoBoleto()">
+      <div class="card success-card" (click)="$event.stopPropagation()">
+        <mat-icon class="success-icon">check_circle</mat-icon>
+        <h2 class="success-title">Boleto emitido con exito</h2>
+
+        <div class="ticket-details">
+          <div class="ticket-row">
+            <span class="ticket-label">Pasajero</span>
+            <span class="ticket-value">{{ boletoEmitido()?.cliente?.nombre }}</span>
+          </div>
+          <div class="ticket-row">
+            <span class="ticket-label">CI</span>
+            <span class="ticket-value">{{ boletoEmitido()?.cliente?.ci }}</span>
+          </div>
+          <div class="ticket-row">
+            <span class="ticket-label">Asiento</span>
+            <span class="ticket-value mono">#{{ boletoEmitido()?.asiento?.numeroAsiento }}</span>
+          </div>
+          <div class="ticket-row">
+            <span class="ticket-label">Precio</span>
+            <span class="ticket-value mono">{{ boletoEmitido()?.precioPagado | currencyBob }}</span>
+          </div>
+        </div>
+
+        <div class="success-actions">
+          <button class="btn btn-primary btn-sm" (click)="descargarPDF()">
+            <mat-icon>picture_as_pdf</mat-icon> Descargar Boleto
+          </button>
+          <button class="btn btn-accent btn-sm" (click)="nuevoBoleto()">
+            <mat-icon>add</mat-icon> Nueva venta
+          </button>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="card search-card">
+      <div class="search-title">
+        <mat-icon class="search-title-icon">confirmation_number</mat-icon>
+        <h3>Buscar viajes disponibles</h3>
+      </div>
+      <div class="search-grid">
+        @if (showOrigen()) {
+          <div>
+            <label class="field-label">Origen</label>
+            <div class="input-wrap">
+              <mat-icon class="input-icon">location_on</mat-icon>
+              <select class="input input-pl" [(ngModel)]="origenId" (change)="onOrigenChange()">
+                <option value="">Seleccionar</option>
+                @for (r of origenes(); track r.id) {
+                  <option [value]="r.id">{{ r.nombre }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        }
+        <div>
+          <label class="field-label">Destino</label>
+          <div class="input-wrap">
+            <mat-icon class="input-icon accent-icon">location_on</mat-icon>
+            <select class="input input-pl" [(ngModel)]="destinoId">
+              <option value="">Seleccionar</option>
+              @for (r of destinos(); track r.id) {
+                <option [value]="r.id">{{ r.nombre }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="field-label">Fecha</label>
+          <div class="input-wrap">
+            <mat-icon class="input-icon">calendar_today</mat-icon>
+            <input class="input input-pl" type="date" [ngModel]="fechaStr()" (ngModelChange)="setFechaStr($event)" />
+          </div>
+        </div>
+        <div>
+          <label class="field-label">Pasajeros</label>
+          <select class="input">
+            <option>1 pasajero</option><option>2 pasajeros</option><option>3 pasajeros</option><option>4 pasajeros</option>
+          </select>
+        </div>
+        <button class="btn btn-primary search-btn" (click)="buscarViajes()" [disabled]="loading()">
+          <mat-icon>search</mat-icon> Buscar
+        </button>
+      </div>
+    </div>
+
+    <div class="ventas-layout">
+      <div class="ventas-left">
+        @if (viajesDisponibles().length > 0) {
+          <div class="card">
+            <div class="trips-header">
+              <h3>{{ viajesDisponibles().length }} viajes disponibles</h3>
+            </div>
+            @for (t of viajesDisponibles(); track t.id) {
+              <button class="trip-row" [class.active]="viajeSeleccionado()?.id === t.id" (click)="seleccionarViaje(t)">
+                <div class="trip-time-col">
+                  <span class="mono trip-dep">{{ t.horario.horaSalida }}</span>
+                  <div class="trip-dur">
+                    <mat-icon class="dur-icon">schedule</mat-icon>
+                    <span class="muted">{{ t.horario.horaSalida }}</span>
+                  </div>
+                </div>
+                <div class="trip-info-col">
+                  <div class="trip-bus">{{ t.bus?.placa || '---' }}</div>
+                </div>
+                <div class="trip-seats-col">
+                  <div class="muted seats-label">Disponibles</div>
+                  <div class="seats-nums">
+                    <span class="mono seats-avail" [style.color]="(t.totalLibres || 0) < 10 ? 'var(--err-600)' : 'var(--ok-700)'">{{ t.totalLibres || 0 }}</span>
+                    <span class="mono seats-total muted">/ {{ t.bus?.capacidad || '---' }}</span>
+                  </div>
+                </div>
+                <div class="trip-price-col">
+                  <div class="muted price-label">Desde</div>
+                  <div class="mono price-value">Bs <span class="price-accent">{{ precioAsiento() > 0 ? (precioAsiento() | currencyBob) : '—' }}</span></div>
+                </div>
+              </button>
+            }
+          </div>
+        }
+
+        @if (viajeSeleccionado()) {
+          <div class="card seat-card">
+            <div class="seat-header">
+              <div>
+                <h3>Seleccion de asientos</h3>
+                <p class="muted">{{ viajeSeleccionado()?.bus?.placa }} · Primer piso</p>
+              </div>
+              <div class="seat-legend">
+                <div class="legend-item"><span class="dot libre"></span>Disponible</div>
+                <div class="legend-item"><span class="dot selected"></span>Seleccionado</div>
+                <div class="legend-item"><span class="dot ocupado"></span>Ocupado</div>
+              </div>
+            </div>
+            <div class="seat-layout">
+              <div class="bus-diagram">
+                <div class="bus-floor-label">Planta superior</div>
+                <div class="bus-horizontal">
+                  <div class="bus-back-v">POSTERIOR</div>
+                  <div class="seat-grid">
+                    @for (fila of asientosFilas().superior; track fila; let i = $index) {
+                      <div class="seat-row">
+                        <div class="seats-pair">
+                          @for (a of fila.izquierda; track a.id) {
+                            <button class="seat" [class]="seatClass(a)" (click)="toggleAsiento(a)">{{ a.numeroAsiento }}</button>
+                          }
+                        </div>
+                        <div class="row-num">{{ i + 1 }}</div>
+                        @for (a of fila.derecha; track a.id) {
+                          <button class="seat" [class]="seatClass(a)" (click)="toggleAsiento(a)">{{ a.numeroAsiento }}</button>
+                        }
+                      </div>
+                    }
+                  </div>
+                  <div class="bus-front-v">
+                    <div class="steering-box"><mat-icon>settings</mat-icon></div>
+                    <div class="front-label">FRENTE</div>
+                    <div class="co-driver-box"><mat-icon>person</mat-icon></div>
+                  </div>
+                </div>
+                @if (asientosFilas().inferior) {
+                  <div class="bus-floor-label">Planta inferior</div>
+                  <div class="bus-horizontal">
+                    <div class="seat-grid">
+                      @for (fila of asientosFilas().inferior; track fila; let i = $index) {
+                        <div class="seat-row">
+                          <div class="seats-pair">
+                            @for (a of fila.izquierda; track a.id) {
+                              <button class="seat" [class]="seatClass(a)" (click)="toggleAsiento(a)">{{ a.numeroAsiento }}</button>
+                            }
+                          </div>
+                          <div class="row-num">{{ i + 1 }}</div>
+                          @for (a of fila.derecha; track a.id) {
+                            <button class="seat" [class]="seatClass(a)" (click)="toggleAsiento(a)">{{ a.numeroAsiento }}</button>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <div class="seat-summary">
+                <div class="eyebrow">ASIENTOS SELECCIONADOS</div>
+                @if (selectedSeats().length === 0) {
+                  <div class="seat-empty">
+                    Haz clic en los asientos disponibles<br/>(verde) para reservarlos.
+                  </div>
+                } @else {
+                  @for (s of selectedSeats(); track s.id) {
+                    <div class="seat-item">
+                      <div class="seat-item-left">
+                        <div class="seat-num-box">{{ s.numeroAsiento }}</div>
+                        <div>
+                          <div class="seat-item-title">Asiento {{ s.numeroAsiento }}</div>
+                          <div class="muted seat-item-pos">{{ isWindowSeat(s.numeroAsiento) ? 'Ventana' : 'Pasillo' }}</div>
+                        </div>
+                      </div>
+                      <div class="seat-item-right">
+                        <span class="mono seat-item-price">{{ precioEfectivo() | currencyBob }}</span>
+                        <button class="btn-icon-remove" (click)="toggleAsiento(s)"><mat-icon>close</mat-icon></button>
+                      </div>
+                    </div>
+                  }
+                }
+                <div class="seat-pricing">
+                  <div class="price-row"><span class="muted">Subtotal ({{ selectedSeats().length }} × {{ precioEfectivo() | currencyBob }})</span><span class="mono">{{ subtotal() | currencyBob }}</span></div>
+                  <div class="price-row"><span class="muted">Tasa terminal</span><span class="mono">{{ tasaTerminal() | currencyBob }}</span></div>
+                  <div class="price-row total-row"><span class="fw700">Total</span><span class="mono price-total">{{ totalBs | currencyBob }}</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (viajesDisponibles().length === 0 && loading()) {
+          <div class="empty-state"><span class="muted">Buscando viajes...</span></div>
+        }
+        @if (viajesDisponibles().length === 0 && !loading() && origenId()) {
+          <div class="empty-state"><mat-icon class="empty-icon">search_off</mat-icon><span>No hay viajes disponibles</span></div>
+        }
+      </div>
+
+      <div class="ventas-right">
+        <div class="card passenger-card">
+          <div class="pass-header">
+            <div class="pass-icon"><mat-icon>person</mat-icon></div>
+            <h3>Datos del pasajero</h3>
+          </div>
+          <p class="muted pass-desc">Informacion requerida para emitir el boleto.</p>
+
+          <form [formGroup]="passengerForm" class="pass-form">
+            <div>
+              <label class="field-label">Carnet de Identidad (CI)</label>
+              <div class="ci-row">
+                <input class="input ci-input" formControlName="ci" placeholder="8765432" />
+                <select class="input ci-exp" formControlName="expedido">
+                  <option>LP</option><option>CB</option><option>SC</option><option>OR</option><option>PT</option><option>SU</option><option>TJ</option><option>BE</option><option>PA</option>
+                </select>
+              </div>
+              <div class="ci-status">
+                @if (clienteStatus() === 'searching') {
+                  <span class="ci-searching">Buscando...</span>
+                }
+                @if (clienteStatus() === 'found') {
+                  <span class="ci-found"><mat-icon>check_circle</mat-icon> Cliente encontrado</span>
+                }
+                @if (clienteStatus() === 'new') {
+                  <span class="ci-new">Cliente nuevo, complete los datos</span>
+                }
+              </div>
+            </div>
+            <div class="pass-row-2">
+              <div>
+                <label class="field-label">Nombre</label>
+                <input class="input" formControlName="nombre" placeholder="Ana Maria" [readonly]="clienteStatus() === 'found'" />
+              </div>
+              <div>
+                <label class="field-label">Apellidos</label>
+                <input class="input" formControlName="apellidos" placeholder="Quispe Mamani" />
+              </div>
+            </div>
+            <div>
+              <label class="field-label">Celular</label>
+              <input class="input" formControlName="celular" placeholder="+591 7xxx xxxx" [readonly]="clienteStatus() === 'found'" />
+            </div>
+            <div>
+              <label class="field-label">Correo (opcional)</label>
+              <input class="input" formControlName="correo" placeholder="boleto digital se enviara aqui" [readonly]="clienteStatus() === 'found'" />
+            </div>
+            <div>
+              <label class="field-label">Precio de venta (Bs) <span class="muted">— por asiento, vacio usa tarifa</span></label>
+              <input class="input" type="number" formControlName="precioVenta" [placeholder]="precioAsiento() || 'Tarifa'" />
+            </div>
+
+            <div class="pago-section">
+              <label class="field-label">Metodo de pago</label>
+              <div class="pago-grid">
+                @for (p of pagos(); track p.id) {
+                  <button type="button" class="pago-btn" [class.active]="p.active" (click)="setPago(p.id)">
+                    <mat-icon>{{ p.icon }}</mat-icon> {{ p.label }}
+                  </button>
+                }
+              </div>
+            </div>
+          </form>
+
+          <button class="btn btn-accent sell-btn" (click)="venderBoleto()" [disabled]="vendiendo() || selectedSeats().length === 0">
+            @if (vendiendo()) { Emitiendo... } @else { Emitir boleto }
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

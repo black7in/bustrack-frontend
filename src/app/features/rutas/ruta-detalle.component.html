@@ -1,0 +1,75 @@
+<div class="page">
+  <div class="back-bar">
+    <a class="back-link" routerLink="/app/rutas"><mat-icon>arrow_back</mat-icon> Volver a rutas</a>
+  </div>
+  @if (ruta()) {
+    <div class="ruta-header">
+      <h2>{{ ruta().origen.nombre }} → {{ ruta().destino.nombre }}</h2>
+      <span class="muted">{{ ruta().distanciaKm || '---' }} km · {{ ruta().duracionEstimadaMin || '---' }} min</span>
+    </div>
+  }
+
+  <div class="tabs">
+    <button class="tab" [class.active]="tab() === 'horarios'" (click)="tab.set('horarios')">Horarios</button>
+    <button class="tab" [class.active]="tab() === 'tarifas'" (click)="tab.set('tarifas')">Tarifas</button>
+  </div>
+
+  @if (tab() === 'horarios') {
+    <div class="card">
+      <div class="card-top">
+        <span class="muted">{{ horarios().length }} horarios</span>
+        <button class="btn btn-accent btn-sm" (click)="showHorarioForm.set(true)"><mat-icon>add</mat-icon> Nuevo horario</button>
+      </div>
+
+      @if (showHorarioForm()) {
+        <form [formGroup]="horarioForm" (ngSubmit)="saveHorario()" class="inline-form">
+          <div class="form-row">
+            <input class="inp" type="time" formControlName="horaSalida" />
+            <div class="days">@for(d of diasOptions; track d.value){<label class="daylbl" [class.checked]="(horarioForm.value.diasSemana||[]).includes(d.value)"><input type="checkbox" hidden [value]="d.value" (change)="toggleDia(d.value)" />{{d.label}}</label>}</div>
+            <button type="submit" class="btn btn-primary btn-sm" [disabled]="saving()">Guardar</button>
+            <button type="button" class="btn btn-ghost btn-sm" (click)="showHorarioForm.set(false)">Cancelar</button>
+          </div>
+        </form>
+      }
+
+      <table class="tbl">
+        <thead><tr><th>Hora</th><th>Dias</th><th>Activo</th></tr></thead>
+        <tbody>
+          @for (h of horarios(); track h.id) {
+            <tr><td><span class="mono fw600">{{ h.horaSalida }}</span></td><td>{{ diasLabel(h.diasSemana) }}</td><td><span class="badge" [class.badge-ok]="h.activo" [class.badge-err]="!h.activo">{{h.activo?'Activo':'Inactivo'}}</span></td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (tab() === 'tarifas') {
+    <div class="card">
+      <div class="card-top">
+        <span class="muted">{{ tarifas().length }} tarifas</span>
+        <button class="btn btn-accent btn-sm" (click)="showTarifaForm.set(true)"><mat-icon>add</mat-icon> Nueva tarifa</button>
+      </div>
+
+      @if (showTarifaForm()) {
+        <form [formGroup]="tarifaForm" (ngSubmit)="saveTarifa()" class="inline-form">
+          <div class="form-row">
+            <select class="inp" formControlName="tipoDia"><option value="LUNES_JUEVES">Lun a Jue</option><option value="VIERNES_DOMINGO">Vie a Dom</option><option value="FERIADO">Feriado</option><option value="TEMPORADA_ALTA">Temporada alta</option></select>
+            <input class="inp" type="number" formControlName="precioBase" placeholder="Precio Bs" />
+            <input class="inp" type="date" formControlName="vigenteDesde" />
+            <button type="submit" class="btn btn-primary btn-sm" [disabled]="saving()">{{ editingTarifa() ? 'Actualizar' : 'Guardar' }}</button>
+            <button type="button" class="btn btn-ghost btn-sm" (click)="cancelTarifaForm()">Cancelar</button>
+          </div>
+        </form>
+      }
+
+      <table class="tbl">
+        <thead><tr><th>Tipo</th><th>Precio</th><th>Desde</th><th>Hasta</th><th></th></tr></thead>
+        <tbody>
+          @for (t of tarifas(); track t.id) {
+            <tr><td>{{ t.tipoDia }}</td><td class="mono fw600">Bs {{ t.precioBase }}</td><td>{{ t.vigenteDesde || '---' }}</td><td>{{ t.vigenteHasta || '---' }}</td><td><button class="btn btn-ghost btn-icon btn-sm" (click)="editTarifa(t)"><mat-icon>edit</mat-icon></button></td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

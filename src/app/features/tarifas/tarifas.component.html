@@ -1,0 +1,43 @@
+<div class="page">
+  <h2 class="page-title">Tarifas</h2>
+  <div class="top-bar">
+    <select class="inp" style="width:280px" [ngModel]="rutaId()" (ngModelChange)="onRutaChange($event)">
+      <option value="">Seleccionar ruta</option>
+      @for (r of rutas(); track r.id) {
+        <option [value]="r.id">{{ r.origen.nombre }} → {{ r.destino.nombre }}</option>
+      }
+    </select>
+    <button class="btn btn-accent btn-sm" (click)="newTarifa()" [disabled]="!rutaId()"><mat-icon>add</mat-icon> Nueva tarifa</button>
+  </div>
+
+  @if (showForm()) {
+    <div class="card form-card">
+      <form [formGroup]="form" (ngSubmit)="save()" class="form-row">
+        <div class="f">
+          <select class="inp" formControlName="tipoDia">
+            <option value="LUNES_JUEVES">Lun a Jue</option><option value="VIERNES_DOMINGO">Vie a Dom</option>
+            <option value="FERIADO">Feriado</option><option value="TEMPORADA_ALTA">Temporada alta</option>
+          </select>
+        </div>
+        <div class="f"><input class="inp" type="number" formControlName="precioBase" placeholder="Precio Bs" style="width:120px" /></div>
+        <div class="f"><input class="inp" type="date" formControlName="vigenteDesde" /></div>
+        <button type="submit" class="btn btn-primary btn-sm" [disabled]="saving()">{{ editingTarifa() ? 'Actualizar' : 'Guardar' }}</button>
+        <button type="button" class="btn btn-ghost btn-sm" (click)="cancelForm()">Cancelar</button>
+      </form>
+    </div>
+  }
+
+  @if (rutaId() && tarifas().length > 0) {
+    <div class="card table-card">
+      <table class="tbl">
+        <thead><tr><th>Tipo</th><th>Precio Base</th><th>Vigente Desde</th><th>Vigente Hasta</th><th></th></tr></thead>
+        <tbody>
+          @for (t of tarifas(); track t.id) {
+            <tr><td>{{ t.tipoDia }}</td><td class="mono fw600">Bs {{ t.precioBase }}</td><td>{{ t.vigenteDesde || '---' }}</td><td>{{ t.vigenteHasta || '---' }}</td>
+            <td><button class="btn btn-ghost btn-icon btn-sm" (click)="editTarifa(t)"><mat-icon>edit</mat-icon></button></td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
