@@ -33,8 +33,6 @@ export class ReportesComponent {
   readonly iaLoading = signal(false);
   readonly iaPage = signal(1);
   readonly iaPageSize = 50;
-  readonly Math = Math;
-
   readonly paginatedIaRows = computed(() => {
     const rows = this.iaResult()?.filas;
     if (!rows) return [];
