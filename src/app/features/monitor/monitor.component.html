@@ -4,6 +4,8 @@
     <span class="muted">Actualiza cada 30s · {{ viajes().length }} activos</span>
   </div>
 
+  <div id="monitor-map" class="map-container"></div>
+
   @if (viajes().length > 0) {
     <div class="card table-card">
       <table class="tbl">
