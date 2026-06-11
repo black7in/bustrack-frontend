@@ -67,8 +67,16 @@
   <!-- Segmentacion -->
   @if (segmentacion()) {
     <div class="card seg-full">
-      <h3 class="seg-title">Segmentacion de clientes</h3>
-      <p class="muted">{{ segmentacion().totalClientes }} clientes · {{ segmentacion().modeloVersion }}</p>
+      <div class="seg-top">
+        <div>
+          <h3 class="seg-title">Segmentacion de clientes</h3>
+          <p class="muted">{{ segmentacion().totalClientes }} clientes · {{ segmentacion().modeloVersion }}</p>
+        </div>
+        <button class="btn btn-outline btn-sm" (click)="reentrenar()" [disabled]="entrenando()">
+          @if (entrenando()) { <mat-icon class="spin">refresh</mat-icon> Entrenando... }
+          @else { <mat-icon>model_training</mat-icon> Reentrenar modelo }
+        </button>
+      </div>
       <div class="seg-layout">
         <div [appChart]="segmentacionChart()" style="height:260px;flex:1"></div>
         <div class="seg-cards">

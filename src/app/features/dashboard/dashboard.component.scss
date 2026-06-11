@@ -78,6 +78,7 @@
 }
 
 .seg-full { padding: 22px; }
+.seg-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
 .seg-title { margin: 0 0 4px; font-size: 18px; font-weight: 700; color: var(--ink-900); }
 .seg-layout { display: flex; gap: 24px; align-items: center; margin-top: 14px; }
 .seg-cards { display: flex; flex-direction: column; gap: 12px; flex: 1; }
@@ -95,6 +96,9 @@
 .pred-stat { display: flex; flex-direction: column; gap: 4px; }
 .ps-label { font-size: 11px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: .04em; }
 .ps-value { font-size: 20px; font-weight: 800; color: var(--ink-900); }
+
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 .dashboard-grid {
   display: grid;

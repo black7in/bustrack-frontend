@@ -5,6 +5,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterLink } from '@angular/router';
 import { StatCardComponent } from '../../shared/components/stat-card/stat-card.component';
 import { StatusBadgeComponent, BadgeVariant } from '../../shared/components/status-badge/status-badge.component';
@@ -40,7 +42,7 @@ const ESTADO_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
   standalone: true,
   imports: [
     CommonModule, DatePipe, RouterLink,
-    MatIconModule, MatButtonModule, MatMenuModule,
+    MatIconModule, MatButtonModule, MatMenuModule, MatSnackBarModule, MatProgressSpinnerModule,
     StatCardComponent, StatusBadgeComponent, CurrencyBobPipe, ChartDirective,
   ],
   templateUrl: './dashboard.component.html',
@@ -50,10 +52,12 @@ export class DashboardComponent implements OnInit {
   private apollo = inject(Apollo);
   private http = inject(HttpClient);
   private auth = inject(AuthService);
+  private snackBar = inject(MatSnackBar);
 
   readonly resumen = signal<any>(null);
   readonly viajes = signal<ViajeItem[]>([]);
   readonly loading = signal(true);
+  readonly entrenando = signal(false);
 
   readonly prediccion = signal<any>(null);
   readonly segmentacion = signal<any>(null);
@@ -213,6 +217,20 @@ export class DashboardComponent implements OnInit {
   private loadSegmentacion(): void {
     if (!this.auth.getToken()) return;
     this.http.get<any>(`${environment.iaApiUrl}/segmentacion/clientes`, { headers: this.headers() }).subscribe({ next: (r) => this.segmentacion.set(r) });
+  }
+
+  reentrenar(): void {
+    this.entrenando.set(true);
+    this.http.post<any>(`${environment.iaApiUrl}/modelos/reentrenar`, { modelo: 'kmeans' }, { headers: this.headers() }).subscribe({
+      next: (r) => {
+        this.entrenando.set(false);
+        const ok = r.entrenados?.join(', ') || 'OK';
+        const err = r.errores?.length ? ' | Errores: ' + r.errores.join(', ') : '';
+        this.snackBar.open('Reentrenado: ' + ok + err, 'Cerrar', { duration: 4000 });
+        this.loadSegmentacion();
+      },
+      error: (e) => { this.entrenando.set(false); this.snackBar.open('Error: ' + (e.message || 'fallo'), 'Cerrar', { duration: 3000 }); },
+    });
   }
 
   getEstadoInfo(estado: string): { label: string; variant: BadgeVariant } {
