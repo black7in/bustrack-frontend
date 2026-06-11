@@ -31,7 +31,9 @@ export const BOLETOS_REPORTE = gql`
 export const INGRESOS_POR_RUTA = gql`
   query IngresosPorRuta($fechaInicio: String!, $fechaFin: String!) {
     ingresosPorRuta(fechaInicio: $fechaInicio, fechaFin: $fechaFin) {
-      ruta { origen { nombre } destino { nombre } }
+      rutaId
+      origen
+      destino
       totalBoletos
       totalIngresos
     }

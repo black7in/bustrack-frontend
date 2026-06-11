@@ -92,7 +92,7 @@ export class ReportesComponent {
     if (!data.length) return { total: 0, rutaTop: '---', diaTop: '---' };
     const total = data.reduce((s: number, d: any) => s + d.totalIngresos, 0);
     const sorted = [...data].sort((a, b) => b.totalIngresos - a.totalIngresos);
-    const rutaTop = sorted[0]?.ruta?.origen?.nombre + ' \u2192 ' + sorted[0]?.ruta?.destino?.nombre || '---';
+    const rutaTop = sorted[0]?.origen + ' → ' + sorted[0]?.destino || '---';
     return { total, rutaTop, diaTop: '---' };
   });
 
@@ -131,7 +131,7 @@ export class ReportesComponent {
       tooltip: { trigger: 'axis' as const, formatter: (p: any) => p[0]?.name + '<br/>Ingresos: Bs ' + p[0]?.value?.toLocaleString() },
       grid: { left: 160, right: 40, top: 10, bottom: 25 },
       xAxis: { type: 'value' as const, axisLabel: { color: 'var(--color-text-secondary)', fontSize: 10, formatter: (v: number) => (v / 1000).toFixed(0) + 'k' }, splitLine: { lineStyle: { color: 'var(--color-divider)' } } },
-      yAxis: { type: 'category' as const, data: sorted.map((d) => d.ruta.origen.nombre + ' \u2192 ' + d.ruta.destino.nombre), axisLabel: { color: 'var(--color-text-secondary)', fontSize: 11 } },
+      yAxis: { type: 'category' as const, data: sorted.map((d) => d.origen + ' → ' + d.destino), axisLabel: { color: 'var(--color-text-secondary)', fontSize: 11 } },
       series: [{ type: 'bar', data: sorted.map((d) => d.totalIngresos), itemStyle: { color: 'var(--brand-600)', borderRadius: [0, 6, 6, 0] }, barCategoryGap: '30%' }],
     };
   });
