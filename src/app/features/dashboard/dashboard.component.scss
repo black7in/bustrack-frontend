@@ -92,6 +92,7 @@
 .pred-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
 .pred-header h3 { margin: 0; font-size: 18px; font-weight: 700; color: var(--ink-900); }
 .pred-inputs { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+.pred-btn { gap: 6px; }
 .inp { height: 36px; padding: 0 10px; border-radius: var(--r-md); border: 1px solid var(--ink-200); background: var(--color-surface); font-size: 13px; color: var(--color-text-primary); font-family: inherit; }
 select.inp { cursor: pointer; }
 .pred-factores { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 12px; }

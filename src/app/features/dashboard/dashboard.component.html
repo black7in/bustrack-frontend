@@ -105,16 +105,16 @@
       </div>
     </div>
     <div class="pred-inputs">
-      <select class="inp" [(ngModel)]="predRutaId">
+      <select class="inp" [ngModel]="predRutaId()" (ngModelChange)="predRutaId.set($event)">
         <option value="">Ruta</option>
         @for (r of rutasIA(); track r.id) { <option [value]="r.id">{{r.origen.nombre}} → {{r.destino.nombre}}</option> }
       </select>
-      <input class="inp" type="date" [(ngModel)]="predFecha" />
-      <button class="btn btn-primary btn-sm" (click)="predecir()" [disabled]="cargandoPred() || !predRutaId()">
-        @if (cargandoPred()) { <mat-icon class="spin">refresh</mat-icon> } Predecir
+      <input class="inp" type="date" [ngModel]="predFecha()" (ngModelChange)="predFecha.set($event)" />
+      <button class="btn btn-primary btn-sm pred-btn" (click)="predecir()" [disabled]="cargandoPred() || !predRutaId()">
+        @if (cargandoPred()) { <mat-icon class="spin">refresh</mat-icon> }@else{<mat-icon>search</mat-icon>} Predecir
       </button>
-      <button class="btn btn-outline btn-sm" (click)="reentrenarDemand()" [disabled]="entrenandoDemand()">
-        @if (entrenandoDemand()) { <mat-icon class="spin">refresh</mat-icon> } Reentrenar
+      <button class="btn btn-ghost btn-sm pred-btn" (click)="reentrenarDemand()" [disabled]="entrenandoDemand()">
+        @if (entrenandoDemand()) { <mat-icon class="spin">refresh</mat-icon> }@else{<mat-icon>model_training</mat-icon>} Reentrenar
       </button>
     </div>
 
