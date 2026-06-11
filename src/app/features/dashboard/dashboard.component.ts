@@ -170,13 +170,13 @@ export class DashboardComponent implements OnInit {
         next: (result) => {
           if (result.data?.viajes?.items) {
             this.viajes.set(result.data.viajes.items);
-            this.loadPrediccion();
           }
         },
         error: () => this.loading.set(false),
         complete: () => this.loading.set(false),
       });
 
+    this.loadPrediccion();
     this.loadSegmentacion();
   }
 
@@ -184,15 +184,14 @@ export class DashboardComponent implements OnInit {
   private ops(path: string) { return `${environment.operacionesApiUrl}${path}`; }
 
   private loadPrediccion(): void {
+    const token = this.auth.getToken();
+    if (!token) return;
     const ruta = this.viajes()[0];
-    console.log('loadPrediccion called. viajes:', this.viajes().length, 'first:', !!ruta, 'rutaId:', ruta?.horario?.ruta?.id);
-    if (!ruta || !this.auth.getToken()) return;
-    const rutaId = ruta.horario?.ruta?.id;
-    if (!rutaId) return;
+    const rutaId = ruta?.horario?.ruta?.id;
     this.http.get<any>(`${environment.iaApiUrl}/prediccion/demanda`, {
       headers: this.headers(),
-      params: { rutaId, fecha: this.fechaInicio() },
-    }).subscribe({ next: (r) => this.prediccion.set(r), error: (e) => console.warn('Prediccion IA error:', e.status, e.message) });
+      params: { rutaId: rutaId || 'default', fecha: this.fechaInicio() },
+    }).subscribe({ next: (r) => this.prediccion.set(r), error: (e) => console.warn('Prediccion IA:', e.status) });
   }
 
   private loadSegmentacion(): void {
