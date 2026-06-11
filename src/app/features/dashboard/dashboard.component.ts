@@ -183,11 +183,11 @@ export class DashboardComponent implements OnInit {
     this.http.get<any>(`${environment.iaApiUrl}/prediccion/demanda`, {
       headers: this.headers(),
       params: { rutaId: ruta.horario.ruta.origen.nombre + '-' + ruta.horario.ruta.destino.nombre, fecha: this.fechaInicio() },
-    }).subscribe({ next: (r) => this.prediccion.set(r) });
+    }).subscribe({ next: (r) => this.prediccion.set(r), error: () => this.prediccion.set(null) });
   }
 
   private loadSegmentacion(): void {
-    this.http.get<any>(`${environment.iaApiUrl}/segmentacion/clientes`, { headers: this.headers() }).subscribe({ next: (r) => this.segmentacion.set(r) });
+    this.http.get<any>(`${environment.iaApiUrl}/segmentacion/clientes`, { headers: this.headers() }).subscribe({ next: (r) => this.segmentacion.set(r), error: () => this.segmentacion.set(null) });
   }
 
   getEstadoInfo(estado: string): { label: string; variant: BadgeVariant } {
