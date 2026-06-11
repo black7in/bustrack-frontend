@@ -12,6 +12,7 @@ export interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
   { id: 'ventas', label: 'Venta de Boletos', icon: 'confirmation_number' },
+  { id: 'boletos', label: 'Ventas', icon: 'receipt_long' },
   { id: 'viajes', label: 'Viajes', icon: 'alt_route' },
   { id: 'flota', label: 'Flota', icon: 'directions_bus' },
   { id: 'choferes', label: 'Choferes', icon: 'badge' },
@@ -23,7 +24,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'reportes', label: 'Reportes', icon: 'bar_chart' },
 ];
 
-const OPERACION_IDS = ['dashboard', 'ventas', 'viajes', 'flota', 'choferes', 'monitor'];
+const OPERACION_IDS = ['dashboard', 'ventas', 'boletos', 'viajes', 'flota', 'choferes', 'monitor'];
 const CATALOGO_IDS = ['rutas', 'tarifas', 'terminales', 'clientes', 'reportes'];
 
 @Component({
@@ -43,7 +44,7 @@ export class SidebarComponent {
 
   get visibleItems(): NavItem[] {
     if (this.userRole() === 'VENDEDOR') {
-      return NAV_ITEMS.filter((i) => i.id === 'ventas');
+      return NAV_ITEMS.filter((i) => i.id === 'ventas' || i.id === 'boletos');
     }
     return NAV_ITEMS;
   }

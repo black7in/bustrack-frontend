@@ -1,0 +1,112 @@
+<div class="page">
+  <div class="container">
+
+    <div class="header">
+      <div class="logo-row">
+        <div class="logo-icon"><mat-icon>directions_bus</mat-icon></div>
+        <span class="logo-text">BusTrack</span>
+      </div>
+      <h1 class="title">Verificación de Factura</h1>
+      <p class="subtitle">Ingresá el hash SHA-256 de tu factura para comprobar su autenticidad en blockchain.</p>
+    </div>
+
+    <div class="search-card">
+      <label class="field-label">Hash de la factura</label>
+      <div class="input-row">
+        <input
+          class="hash-input"
+          type="text"
+          [(ngModel)]="hashInput"
+          placeholder="a0c76401f3e2b8d9..."
+          (keydown.enter)="verificar()"
+        />
+        <button class="btn btn-primary" (click)="verificar()" [disabled]="loading() || !hashInput.trim()">
+          @if (loading()) {
+            <mat-icon class="spin">refresh</mat-icon> Verificando...
+          } @else {
+            <mat-icon>verified</mat-icon> Verificar
+          }
+        </button>
+      </div>
+      <p class="hint">El hash aparece en la URL del PDF de tu factura como <code>?hash=...</code></p>
+    </div>
+
+    @if (loading()) {
+      <div class="loading-card">
+        <mat-icon class="spin">sync</mat-icon>
+        <span>Consultando la blockchain...</span>
+      </div>
+    }
+
+    @if (!loading() && consultado()) {
+      @if (errorMsg()) {
+        <div class="result-card result-error">
+          <div class="result-icon-wrap error-bg">
+            <mat-icon>error_outline</mat-icon>
+          </div>
+          <div class="result-body">
+            <h2 class="result-title">Error al verificar</h2>
+            <p class="result-desc">{{ errorMsg() }}</p>
+          </div>
+        </div>
+      } @else if (resultado()?.existe && resultado()?.autentica) {
+        <div class="result-card result-valid">
+          <div class="result-header">
+            <div class="result-icon-wrap valid-bg">
+              <mat-icon>verified</mat-icon>
+            </div>
+            <div class="result-body">
+              <h2 class="result-title">Factura válida</h2>
+              <p class="result-desc">Esta factura fue registrada en blockchain y su autenticidad ha sido confirmada.</p>
+            </div>
+          </div>
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Número de factura</span>
+              <span class="detail-value mono">{{ resultado()?.numeroFactura ?? '—' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Monto</span>
+              <span class="detail-value mono">{{ formatMonto(resultado()?.monto) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Fecha de registro</span>
+              <span class="detail-value">{{ formatFecha(resultado()?.fechaRegistro) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Bloque</span>
+              <span class="detail-value mono">{{ resultado()?.blockNumber ?? '—' }}</span>
+            </div>
+            <div class="detail-item detail-full">
+              <span class="detail-label">Transaction Hash</span>
+              <span class="detail-value mono txhash">{{ resultado()?.txHash ?? '—' }}</span>
+            </div>
+          </div>
+          @if (resultado()?.urlExplorador) {
+            <a class="explorer-link" [href]="resultado()!.urlExplorador!" target="_blank" rel="noopener">
+              <mat-icon>open_in_new</mat-icon>
+              Ver en Polygonscan
+            </a>
+          }
+        </div>
+      } @else {
+        <div class="result-card result-invalid">
+          <div class="result-header">
+            <div class="result-icon-wrap invalid-bg">
+              <mat-icon>cancel</mat-icon>
+            </div>
+            <div class="result-body">
+              <h2 class="result-title">Factura no encontrada</h2>
+              <p class="result-desc">No se encontró ninguna factura con ese hash o aún no ha sido registrada en blockchain.</p>
+            </div>
+          </div>
+        </div>
+      }
+    }
+
+    <div class="footer">
+      <span>Polygon blockchain &nbsp;·&nbsp; BusTrack {{ currentYear }}</span>
+    </div>
+
+  </div>
+</div>

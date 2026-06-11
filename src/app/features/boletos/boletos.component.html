@@ -1,0 +1,121 @@
+<div class="page">
+
+  <div class="toolbar">
+    <div class="filters">
+      <div class="filter-group">
+        <label class="fl">Estado</label>
+        <select class="inp" [(ngModel)]="estadoFiltro" (change)="aplicarFiltro()">
+          @for (e of ESTADOS; track e.value) {
+            <option [value]="e.value">{{ e.label }}</option>
+          }
+        </select>
+      </div>
+      <button class="btn btn-primary btn-sm" (click)="aplicarFiltro()" [disabled]="loading()">
+        <mat-icon>refresh</mat-icon> Actualizar
+      </button>
+    </div>
+    <div class="total-label">
+      @if (!loading()) {
+        <span class="muted">{{ total() }} boleto{{ total() !== 1 ? 's' : '' }} encontrado{{ total() !== 1 ? 's' : '' }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    @if (loading()) {
+      <div class="loading-row"><mat-icon class="spin">sync</mat-icon> Cargando...</div>
+    } @else if (items().length === 0) {
+      <div class="empty-row"><mat-icon>inbox</mat-icon> No hay boletos para mostrar.</div>
+    } @else {
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Ruta</th>
+            <th class="center">Asiento</th>
+            <th class="right">Precio</th>
+            <th>Vendedor</th>
+            <th class="center">Estado</th>
+            <th class="center">Factura</th>
+            <th class="center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (b of items(); track b.id) {
+            <tr>
+              <td class="nowrap">
+                <span class="fecha-venta">{{ formatFecha(b.fechaVenta) }}</span>
+                @if (b.viaje?.fecha) {
+                  <span class="fecha-viaje muted">Viaje {{ b.viaje!.fecha | date:'dd/MM' }} {{ b.viaje?.horario?.horaSalida }}</span>
+                }
+              </td>
+              <td>
+                <div class="cliente-nombre">{{ b.cliente.nombre }}</div>
+                <div class="cliente-ci muted mono">{{ b.cliente.ci }}</div>
+              </td>
+              <td class="ruta-cell">{{ ruta(b) }}</td>
+              <td class="center mono fw700">{{ b.asiento?.numeroAsiento ?? '—' }}</td>
+              <td class="right mono">{{ b.precioPagado | currencyBob }}</td>
+              <td class="muted">{{ b.vendedor?.nombre ?? '—' }}</td>
+              <td class="center">
+                <span class="badge" [class]="estadoClass(b.estado)">{{ b.estado }}</span>
+              </td>
+              <td class="center">
+                @if (b.factura?.numeroFactura) {
+                  <div class="factura-cell">
+                    <span class="mono factura-num">{{ b.factura!.numeroFactura }}</span>
+                    <span class="bc-badge" [class]="blockchainClass(b.factura?.blockchainEstado)">
+                      {{ b.factura?.blockchainEstado ?? '—' }}
+                    </span>
+                  </div>
+                } @else {
+                  <span class="muted">—</span>
+                }
+              </td>
+              <td class="center">
+                <div class="actions">
+                  @if (b.pdfUrl) {
+                    <button class="icon-btn" title="Descargar boleto PDF" (click)="verPDF(b.pdfUrl)">
+                      <mat-icon>picture_as_pdf</mat-icon>
+                    </button>
+                  }
+                  @if (b.factura?.pdfUrl) {
+                    <button class="icon-btn" title="Descargar factura PDF" (click)="verPDF(b.factura!.pdfUrl!)">
+                      <mat-icon>receipt_long</mat-icon>
+                    </button>
+                  }
+                  @if (b.factura?.hashSha256) {
+                    <button class="icon-btn icon-btn-verify" title="Verificar en blockchain" (click)="verificarFactura(b.factura!.hashSha256!)">
+                      <mat-icon>verified</mat-icon>
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  @if (!loading() && totalPages() > 1) {
+    <div class="pagination">
+      <button class="pg-btn" (click)="irPagina(page() - 1)" [disabled]="page() === 1">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      @for (p of pages(); track p) {
+        @if (p === 1 || p === totalPages() || (p >= page() - 2 && p <= page() + 2)) {
+          <button class="pg-btn" [class.active]="p === page()" (click)="irPagina(p)">{{ p }}</button>
+        } @else if (p === page() - 3 || p === page() + 3) {
+          <span class="pg-ellipsis">…</span>
+        }
+      }
+      <button class="pg-btn" (click)="irPagina(page() + 1)" [disabled]="page() === totalPages()">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+      <span class="pg-info muted">{{ (page() - 1) * 20 + 1 }}–{{ minVal(page() * 20, total()) }} de {{ total() }}</span>
+    </div>
+  }
+
+</div>

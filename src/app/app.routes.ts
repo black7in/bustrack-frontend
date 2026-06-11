@@ -25,6 +25,11 @@ export const routes: Routes = [
         canActivate: [roleGuard(['ADMIN', 'VENDEDOR', 'SUPERVISOR'])],
       },
       {
+        path: 'boletos',
+        loadChildren: () => import('./features/boletos/boletos.routes').then(m => m.routes),
+        canActivate: [roleGuard(['ADMIN', 'VENDEDOR', 'SUPERVISOR'])],
+      },
+      {
         path: 'viajes',
         loadChildren: () => import('./features/viajes/viajes.routes').then(m => m.routes),
         canActivate: [roleGuard(['ADMIN', 'SUPERVISOR'])],
@@ -75,6 +80,10 @@ export const routes: Routes = [
         canActivate: [roleGuard(['ADMIN', 'SUPERVISOR'])],
       },
     ],
+  },
+  {
+    path: 'verificar',
+    loadComponent: () => import('./features/verificar/verificar.component').then(m => m.VerificarComponent),
   },
   { path: '**', redirectTo: '/login' },
 ];

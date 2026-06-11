@@ -91,6 +91,42 @@ export const BOLETO_POR_ID = gql`
   }
 `;
 
+export const LISTA_VENTAS = gql`
+  query ListaVentas($page: Int, $limit: Int, $estado: EstadoBoleto) {
+    boletos(page: $page, limit: $limit, estado: $estado) {
+      total
+      items {
+        id
+        estado
+        precioPagado
+        fechaVenta
+        pdfUrl
+        cliente { id nombre ci telefono }
+        vendedor { nombre }
+        viaje {
+          fecha
+          horario {
+            horaSalida
+            ruta {
+              origen { ciudad }
+              destino { ciudad }
+            }
+          }
+        }
+        asiento { numeroAsiento }
+        factura {
+          numeroFactura
+          monto
+          hashSha256
+          blockchainTxHash
+          blockchainEstado
+          pdfUrl
+        }
+      }
+    }
+  }
+`;
+
 export const VENDER_BOLETO = gql`
   mutation VenderBoleto($input: VenderBoletoInput!) {
     venderBoleto(input: $input) {

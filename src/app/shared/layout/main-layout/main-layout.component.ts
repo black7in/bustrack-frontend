@@ -12,6 +12,7 @@ import { ThemeService } from '../../../core/theme/theme.service';
 const HEADER_DATA: Record<string, { title: string; subtitle: string; breadcrumbs: string[] }> = {
   dashboard: { title: 'Dashboard', subtitle: 'Resumen general', breadcrumbs: ['Operacion', 'Dashboard'] },
   ventas: { title: 'Venta de Boletos', subtitle: 'Buscar y emitir', breadcrumbs: ['Operacion', 'Venta de Boletos'] },
+  boletos: { title: 'Ventas', subtitle: 'Historial de boletos emitidos', breadcrumbs: ['Operacion', 'Ventas'] },
   viajes: { title: 'Viajes', subtitle: 'Programacion y operacion', breadcrumbs: ['Operacion', 'Viajes'] },
   flota: { title: 'Flota', subtitle: 'Buses registrados', breadcrumbs: ['Operacion', 'Flota'] },
   choferes: { title: 'Choferes', subtitle: 'Conductores profesionales', breadcrumbs: ['Operacion', 'Choferes'] },
